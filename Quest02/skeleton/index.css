@@ -1,0 +1,34 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  width: 1000px;
+  margin: 0 auto;
+}
+
+.main {
+  width: 720px;
+  margin: 0 auto;
+}
+
+.nav-container {
+  position: fixed;
+  display: flex;
+  justify-content: space-between;
+  top: 0;
+  width: 1000px;
+}
+
+header {
+  margin: 50px 0px;
+}
+
+header .search-form {
+  text-align: center;
+}
+
+header .search-form input {
+  width: 80%;
+}
