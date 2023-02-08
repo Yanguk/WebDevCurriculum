@@ -32,15 +32,77 @@
 			<div class="square"></div>
 		</section>
 
+		<button id="startButton">별찍기</button>
 		<script>
+			const makeStarList = (row) => {
+				const maxStar = 2 * row - 1;
+
+				const list = Array.from({ length: row }, (_, idx) => {
+					const result = new Array(maxStar).fill('*');
+
+					let left = 0;
+					let right = maxStar - 1;
+
+					while (idx > 0) {
+						result[left] = ' ';
+						result[right] = ' ';
+
+						left += 1;
+						right -= 1;
+						idx -= 1;
+					}
+
+					return result;
+				});
+
+				return list;
+			};
+
+			const makeStarStr = (starList) => starList.length === 0 ? '' : [...starList]
+				.map((arr) => arr.join(''))
+				.reduceRight((acc, cur) => (acc + `\n${cur}`));
+
+			const handleOnClick = (e) => {
+				const rowCount = Number(prompt('줄 수를 입력해주세요', 0));
+
+				if (Number.isNaN(rowCount) || rowCount < 0) {
+					alert('유효한 숫자를 입력해주세요');
+					return;
+				}
+
+				console.log(
+					makeStarStr(
+						makeStarList(rowCount)));
+			};
+
+			document.querySelector('#startButton').addEventListener('click', handleOnClick);
+
 			let row1Squares = document.querySelectorAll('.row1 .square');
-			for(let node of row1Squares) {
+			for (let node of row1Squares) {
 				/* TODO: node 변수를 어떻게 조작해야 할까요? */
+				node.addEventListener('click', (e) => {
+					const target = e.currentTarget;
+					const yellowColor = 'yellow';
+
+					const nextColor = target.style.backgroundColor === yellowColor ? '' : yellowColor;
+
+					if (nextColor) {
+						target.setAttribute('style', `background-color: ${nextColor}`);
+						return;
+					}
+
+					target.removeAttribute('style');
+				});
 			}
 
 			let row2Squares = document.querySelectorAll('.row2 .square');
-			for(let node of row2Squares) {
+			for (let node of row2Squares) {
 				/* TODO: node 변수를 어떻게 조작해야 할까요? */
+				node.addEventListener('click', (e) => {
+					const target = e.currentTarget;
+
+					target.classList.toggle('enabled');
+				});
 			}
 		</script>
 	</body>
