@@ -25,7 +25,7 @@ class Desktop {
     this.units.forEach((units) => units.render(this.element));
 
     this.#changeAbsolute();
-    this.#addMoveEvent();
+    this.#AddUnitsEvent();
   }
 
   #changeAbsolute() {
@@ -46,17 +46,14 @@ class Desktop {
     this.units.forEach(changePosition);
   }
 
-  #addMoveEvent() {
-    const desktopEl = this.element;
-    const windowEl = desktopEl.parentElement;
-
+  #AddUnitsEvent() {
     const addMoveEvent = ({ element }) => {
       element.addEventListener('mousedown', (e) => {
         e.preventDefault();
 
         const handleOnMoveEvent = (e) => {
           const { width, height } = element.getClientRects()[0];
-          const desktopRect = desktopEl.getClientRects()[0];
+          const desktopRect = this.element.getClientRects()[0];
 
           const maxY = desktopRect.height - height;
           const maxX = desktopRect.width - width;
@@ -70,9 +67,9 @@ class Desktop {
           element.style.left = `${Math.min(Math.max(dx, minX), maxX)}px`;
         };
 
-        desktopEl.addEventListener('mousemove', handleOnMoveEvent);
-        desktopEl.addEventListener('mouseup', () => {
-          desktopEl.removeEventListener('mousemove', handleOnMoveEvent);
+        this.element.addEventListener('mousemove', handleOnMoveEvent);
+        this.element.addEventListener('mouseup', () => {
+          this.element.removeEventListener('mousemove', handleOnMoveEvent);
         }, { once: true });
       });
     };
