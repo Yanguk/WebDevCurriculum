@@ -37,7 +37,6 @@ class Desktop {
 
       element.style.left = `${x - parentRect.x}px`;
       element.style.top = `${y - parentRect.y}px`;
-      console.log(x, y);
     };
 
     const changePosition = ({ element }) =>
@@ -146,7 +145,7 @@ class Folder extends Icon {
 
   #openWindow() {
     const parent = this.element.parentElement;
-    this.window.open(parent);
+    this.window.render(parent);
   }
 
   #isOpenWindow() {
@@ -184,28 +183,31 @@ class Window {
 
     this.#addCloseButtonEvent();
     this.#addMoveEvent();
+    this.isInit = true;
   }
 
-  open(parent) {
+  render(parent) {
     parent.appendChild(this.element);
 
-    this.desktop.init();
+    if (this.isInit) {
+      this.desktop.init();
+      this.isInit = false;
+    }
   }
 
   #addCloseButtonEvent() {
     const closeWindow = (e) => {
-      this.element.style.top = '30px';
-      this.element.style.left = '30px';
-
-      this.element.remove();
+      if (e.target === e.currentTarget) {
+        this.element.remove();
+      }
     };
+
     const closeButton = this.element.querySelector('.close');
     closeButton.addEventListener('click', closeWindow);
   }
 
   #addMoveEvent() {
     const barEl = this.element.querySelector('.head-bar');
-    const windowEl = this.element;
 
     let initClickRect = { x: 0, y: 0 };
     let dx = 0;
@@ -214,24 +216,25 @@ class Window {
     const handleOnMoveEvent = (e) => {
       dx = e.clientX - initClickRect.x;
       dy = e.clientY - initClickRect.y;
-      console.log('window Move')
-      windowEl.style.transform = `translate(${dx}px, ${dy}px)`;
+
+      this.element.style.transform = `translate(${dx}px, ${dy}px)`;
     };
 
     const removeEvent = (e) => {
       window.removeEventListener('mousemove', handleOnMoveEvent);
-      windowEl.style.top = `${windowEl.offsetTop + dy}px`;
-      windowEl.style.left = `${windowEl.offsetLeft + dx}px`;
-      windowEl.style.transform = 'translate(0px, 0px)';
+      this.element.style.top = `${this.element.offsetTop + dy}px`;
+      this.element.style.left = `${this.element.offsetLeft + dx}px`;
+      this.element.style.transform = 'translate(0px, 0px)';
     };
 
     const handleOnMousedown = (e) => {
-      initClickRect.x = e.clientX;
-      initClickRect.y = e.clientY;
+      if (e.target === e.currentTarget) {
+        initClickRect.x = e.clientX;
+        initClickRect.y = e.clientY;
 
-      console.log(123213);
-      window.addEventListener('mousemove', handleOnMoveEvent);
-      window.addEventListener('mouseup', removeEvent, { once: true });
+        window.addEventListener('mousemove', handleOnMoveEvent);
+        window.addEventListener('mouseup', removeEvent, { once: true });
+      }
     };
 
     barEl.addEventListener('mousedown', handleOnMousedown);
