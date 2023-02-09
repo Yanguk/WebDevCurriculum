@@ -1,1 +1,18 @@
 /* TODO: 자유롭게 바탕화면 시스템의 CSS를 만들어 보세요! */
+
+p {
+  margin: 0;
+}
+
+.desktop {
+  display: flex;
+  flex-direction: row;
+  position: relative;
+}
+
+.unit {
+  width: 60px;
+  height: 75px;
+  text-align: center;
+  position: relative;
+}
