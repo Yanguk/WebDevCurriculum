@@ -6,15 +6,10 @@ const makeElement = (template) => {
 };
 
 class Desktop {
-  element;
-  units;
-
   constructor({ desktopEl, iconCount, folderCount }) {
-    this.element = desktopEl;
-
     const icons = Array.from(
       { length: iconCount },
-      (_, idx) => new Icon(`파일${idx}`)
+      (_, idx) => new File(`파일${idx}`)
     );
 
     const folders = Array.from(
@@ -22,6 +17,7 @@ class Desktop {
       (_, idx) => new Folder(`새폴더${idx}`)
     );
 
+    this.element = desktopEl;
     this.units = [...icons, ...folders];
   }
 
@@ -33,13 +29,19 @@ class Desktop {
   }
 
   #changeAbsolute() {
+    const parent = this.element.parentElement;
+    const parentRect = parent.getClientRects()[0];
+
     const changeCoordinate = ({ element }) => {
       const { x, y } = element.getClientRects()[0];
-      element.style.left = `${x}px`;
-      element.style.top = `${y}px`;
+
+      element.style.left = `${x - parentRect.x}px`;
+      element.style.top = `${y - parentRect.y}px`;
+      console.log(x, y);
     };
 
-    const changePosition = ({ element }) => (element.style.position = 'absolute');
+    const changePosition = ({ element }) =>
+      (element.style.position = 'absolute');
 
     this.units.forEach(changeCoordinate);
     this.units.forEach(changePosition);
@@ -47,35 +49,45 @@ class Desktop {
 
   #addMoveEvent() {
     const desktopEl = this.element;
+    const windowEl = desktopEl.parentElement;
+    const windowRect = windowEl.getClientRects()[0];
 
-    let targetEl;
-
-    const addEvent = ({ element }) => {
+    const addMoveEvent = ({ element }) => {
       const { width, height } = element.getClientRects()[0];
+      const desktopRect = desktopEl.getClientRects()[0];
 
-      const moveEvent = (e) => {
-        element.style.top = `${e.clientY - height / 2}px`;
-        element.style.left = `${e.clientX - width / 2}px`;
+      const handleOnMoveEvent = (e) => {
+        element.style.top = `${
+          Math.min(
+            Math.max(e.clientY - height / 2, windowRect.y),
+            desktopRect.height - height
+          ) - windowRect.y
+        }px`;
+
+        element.style.left = `${
+          Math.min(
+            Math.max(e.clientX - width / 2, windowRect.x),
+            desktopRect.width - width
+          ) - windowRect.x
+        }px`;
       };
 
       element.addEventListener('mousedown', (e) => {
         e.preventDefault();
-        targetEl = element;
-        targetEl.addEventListener('mousemove', moveEvent);
+
+        desktopEl.addEventListener('mousemove', handleOnMoveEvent);
+        desktopEl.addEventListener('mouseup', () => {
+          desktopEl.removeEventListener('mousemove', handleOnMoveEvent);
+        }, { once: true });
       });
     };
 
-    this.units.forEach(addEvent);
-    //todo: desktop 이벤트로 변경 필요
-    this.element.addEventListener('mouseup', () => {
-      targetEl.removeEventListener('mousemove', moveEvent);
-    });
+    this.units.forEach(addMoveEvent);
   }
 }
 
-class Unit {
+class Icon {
   element;
-
   constructor() {}
 
   render(parent) {
@@ -83,14 +95,12 @@ class Unit {
   }
 }
 
-class Icon extends Unit {
-  /* TODO: Icon 클래스는 어떤 멤버함수와 멤버변수를 가져야 할까요? */
-  constructor(name = '새폴더') {
+class File extends Icon {
+  constructor(name = '새파일') {
     super();
 
     const imgSrc = './assets/file.png';
     const className = 'unit icon';
-
     const template = `
 			<article class="${className}">
 				<img src="${imgSrc}">
@@ -102,8 +112,7 @@ class Icon extends Unit {
   }
 }
 
-class Folder extends Unit {
-  /* TODO: Folder 클래스는 어떤 멤버함수와 멤버변수를 가져야 할까요? */
+class Folder extends Icon {
   constructor(name = '새폴더') {
     super();
 
@@ -118,9 +127,114 @@ class Folder extends Unit {
 		`;
 
     this.element = makeElement(template);
+    this.window = new Window();
+  }
+
+  render(parent) {
+    parent.appendChild(this.element);
+
+    this.#addDoubleClickEvent();
+  }
+
+  #addDoubleClickEvent() {
+    this.element.addEventListener('dblclick', (e) => {
+      if (this.#isOpenWindow()) return;
+
+      this.#openWindow();
+    });
+  }
+
+  #openWindow() {
+    const parent = this.element.parentElement;
+    this.window.open(parent);
+  }
+
+  #isOpenWindow() {
+    const parent = this.element.parentElement;
+    const windows = parent.getElementsByClassName('window');
+
+    for (const el of windows) {
+      if (el === this.window.element) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
 
 class Window {
-  /* TODO: Window 클래스는 어떤 멤버함수와 멤버변수를 가져야 할까요? */
+  constructor() {
+    const className = 'window';
+    const template = `
+      <div class="${className}">
+        <div class="head-bar">
+          <button class="close">X</button>
+        </div>
+        <section class="desktop"></section>
+      </div>
+    `;
+
+    this.element = makeElement(template);
+
+    this.desktop = new Desktop({
+      desktopEl: this.element.querySelector('.desktop'),
+      iconCount: 2,
+    });
+
+    this.#addCloseButtonEvent();
+    this.#addMoveEvent();
+  }
+
+  open(parent) {
+    parent.appendChild(this.element);
+
+    this.desktop.init();
+  }
+
+  #addCloseButtonEvent() {
+    const closeWindow = (e) => {
+      this.element.style.top = '30px';
+      this.element.style.left = '30px';
+
+      this.element.remove();
+    };
+    const closeButton = this.element.querySelector('.close');
+    closeButton.addEventListener('click', closeWindow);
+  }
+
+  #addMoveEvent() {
+    const barEl = this.element.querySelector('.head-bar');
+    const windowEl = this.element;
+
+    let initClickRect = { x: 0, y: 0 };
+    let dx = 0;
+    let dy = 0;
+
+    const handleOnMoveEvent = (e) => {
+      dx = e.clientX - initClickRect.x;
+      dy = e.clientY - initClickRect.y;
+      console.log('window Move')
+      windowEl.style.transform = `translate(${dx}px, ${dy}px)`;
+    };
+
+    const removeEvent = (e) => {
+      window.removeEventListener('mousemove', handleOnMoveEvent);
+      windowEl.style.top = `${windowEl.offsetTop + dy}px`;
+      windowEl.style.left = `${windowEl.offsetLeft + dx}px`;
+      windowEl.style.transform = 'translate(0px, 0px)';
+    };
+
+    const handleOnMousedown = (e) => {
+      initClickRect.x = e.clientX;
+      initClickRect.y = e.clientY;
+
+      console.log(123213);
+      window.addEventListener('mousemove', handleOnMoveEvent);
+      window.addEventListener('mouseup', removeEvent, { once: true });
+    };
+
+    barEl.addEventListener('mousedown', handleOnMousedown);
+
+  }
 }
