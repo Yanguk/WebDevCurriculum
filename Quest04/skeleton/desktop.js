@@ -6,56 +6,80 @@ const makeElement = (template) => {
 };
 
 class Desktop {
-  /* TODO: Desktop 클래스는 어떤 멤버함수와 멤버변수를 가져야 할까요? */
-  constructor({ iconCount, folderCount }) {
-    this.icons = Array.from(
+  element;
+  units;
+
+  constructor({ desktopEl, iconCount, folderCount }) {
+    this.element = desktopEl;
+
+    const icons = Array.from(
       { length: iconCount },
       (_, idx) => new Icon(`파일${idx}`)
     );
 
-    this.folders = Array.from(
+    const folders = Array.from(
       { length: folderCount },
       (_, idx) => new Folder(`새폴더${idx}`)
     );
+
+    this.units = [...icons, ...folders];
   }
 
   init() {
-    this.icons.forEach((icon) => icon.render());
-    this.folders.forEach((folder) => folder.render());
+    this.units.forEach((units) => units.render(this.element));
+
+    this.#changeAbsolute();
+    this.#addMoveEvent();
+  }
+
+  #changeAbsolute() {
+    const changeCoordinate = ({ element }) => {
+      const { x, y } = element.getClientRects()[0];
+      element.style.left = `${x}px`;
+      element.style.top = `${y}px`;
+    };
+
+    const changePosition = ({ element }) => (element.style.position = 'absolute');
+
+    this.units.forEach(changeCoordinate);
+    this.units.forEach(changePosition);
+  }
+
+  #addMoveEvent() {
+    const desktopEl = this.element;
+
+    let targetEl;
+
+    const addEvent = ({ element }) => {
+      const { width, height } = element.getClientRects()[0];
+
+      const moveEvent = (e) => {
+        element.style.top = `${e.clientY - height / 2}px`;
+        element.style.left = `${e.clientX - width / 2}px`;
+      };
+
+      element.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        targetEl = element;
+        targetEl.addEventListener('mousemove', moveEvent);
+      });
+    };
+
+    this.units.forEach(addEvent);
+    //todo: desktop 이벤트로 변경 필요
+    this.element.addEventListener('mouseup', () => {
+      targetEl.removeEventListener('mousemove', moveEvent);
+    });
   }
 }
 
 class Unit {
+  element;
+
   constructor() {}
 
-  render() {
-    const root = document.querySelector('.desktop');
-    root.appendChild(this.element);
-
-    this.#addMoveEvent();
-  }
-
-  #addMoveEvent() {
-    const moveEvent = (e) => {
-			const x = e.clientX;
-			const y = e.clientY;
-			console.log(x, y);
-
-			this.element.style.transform = `translate(${x}px, ${y}px)`;
-    };
-
-		this.element.style.position = 'absolute';
-
-    this.element.addEventListener('mousedown', (e) => {
-			const target = e.currentTarget;
-    });
-
-		this.element.addEventListener('mouseover', moveEvent);
-
-    this.element.addEventListener('mouseout', (e) => {
-			const target = e.currentTarget;
-      target.removeEventListener('mouseover', moveEvent);
-    });
+  render(parent) {
+    parent.appendChild(this.element);
   }
 }
 
