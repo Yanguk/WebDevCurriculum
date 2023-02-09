@@ -49,30 +49,26 @@ class Desktop {
   #addMoveEvent() {
     const desktopEl = this.element;
     const windowEl = desktopEl.parentElement;
-    const windowRect = windowEl.getClientRects()[0];
 
     const addMoveEvent = ({ element }) => {
-      const { width, height } = element.getClientRects()[0];
-      const desktopRect = desktopEl.getClientRects()[0];
-
-      const handleOnMoveEvent = (e) => {
-        element.style.top = `${
-          Math.min(
-            Math.max(e.clientY - height / 2, windowRect.y),
-            desktopRect.height - height
-          ) - windowRect.y
-        }px`;
-
-        element.style.left = `${
-          Math.min(
-            Math.max(e.clientX - width / 2, windowRect.x),
-            desktopRect.width - width
-          ) - windowRect.x
-        }px`;
-      };
-
       element.addEventListener('mousedown', (e) => {
         e.preventDefault();
+
+        const handleOnMoveEvent = (e) => {
+          const { width, height } = element.getClientRects()[0];
+          const desktopRect = desktopEl.getClientRects()[0];
+
+          const maxY = desktopRect.height - height;
+          const maxX = desktopRect.width - width;
+          const minY = 0;
+          const minX = 0;
+
+          const dy = (e.clientY - desktopRect.y) - height / 2;
+          const dx = (e.clientX - desktopRect.x) - width / 2;
+
+          element.style.top = `${Math.min(Math.max(dy, minY), maxY)}px`;
+          element.style.left = `${Math.min(Math.max(dx, minX), maxX)}px`;
+        };
 
         desktopEl.addEventListener('mousemove', handleOnMoveEvent);
         desktopEl.addEventListener('mouseup', () => {
@@ -181,9 +177,10 @@ class Window {
       iconCount: 2,
     });
 
+    this.isInit = true;
+
     this.#addCloseButtonEvent();
     this.#addMoveEvent();
-    this.isInit = true;
   }
 
   render(parent) {
@@ -238,6 +235,5 @@ class Window {
     };
 
     barEl.addEventListener('mousedown', handleOnMousedown);
-
   }
 }
