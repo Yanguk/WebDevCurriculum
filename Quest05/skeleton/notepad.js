@@ -42,11 +42,11 @@ class Notepad {
         }
 
         const targetId = selectFileEl.id;
-        const targetFile = this.store
-          .getFiles()
-          .filter((file) => file.id === Number(targetId.slice(4)))[0];
 
-        targetFile.save();
+        this.store
+          .getFiles()
+          .filter((file) => file.id === targetId.slice(4))[0]
+          .save(this);
       });
   }
 
@@ -263,11 +263,8 @@ class File {
     notepad.activeTab(this);
   }
 
-  save() {
-    const newContent = this.notepad.getMainContent();
-
-    this.content = newContent;
-
-    this.notepad.store.save(this);
+  save(notepad) {
+    this.content = notepad.getMainContent();
+    notepad.store.save(this);
   }
 }
