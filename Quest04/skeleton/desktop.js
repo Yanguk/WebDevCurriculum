@@ -7,7 +7,7 @@ const makeElement = (template) => {
 
 class Desktop {
   element;
-  #units;
+  #icons;
 
   constructor({ desktopEl, iconCount, folderCount }) {
     const icons = Array.from(
@@ -21,11 +21,11 @@ class Desktop {
     );
 
     this.element = desktopEl;
-    this.#units = [...icons, ...folders];
+    this.#icons = [...icons, ...folders];
   }
 
   init() {
-    this.#units.forEach((units) => units.render(this.element));
+    this.#icons.forEach((units) => units.render(this.element));
 
     this.#changeAbsolute();
     this.#addUnitsEvent();
@@ -45,8 +45,8 @@ class Desktop {
     const changePosition = ({ element }) =>
       (element.style.position = 'absolute');
 
-    this.#units.forEach(changeCoordinate);
-    this.#units.forEach(changePosition);
+    this.#icons.forEach(changeCoordinate);
+    this.#icons.forEach(changePosition);
   }
 
   #addUnitsEvent() {
@@ -77,7 +77,7 @@ class Desktop {
       });
     };
 
-    this.#units.forEach(addMoveEvent);
+    this.#icons.forEach(addMoveEvent);
   }
 }
 
