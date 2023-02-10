@@ -8,38 +8,65 @@ html, body {
   height: 100%;
 }
 
+ul, ol, li {
+  list-style-type: none;
+  padding: 0;
+}
+
 .editor-wrapper {
   display: flex;
   width: 100%;
   height: 100%;
 }
 
-.editor-wrapper .explorer-header {
-  height: 35px;
-  background-color: #797979;
-}
-
-.editor-wrapper .explorer {
-  flex: 1;
+.explorer {
+  width: 200px;
   background-color: #999;
 }
 
+.explorer .explorer-header {
+  display: flex;
+  flex-direction: column;
+  height: 40px;
+  background-color: #797979;
+}
+
+.explorer .explorer-header p {
+  text-align: center;
+}
+
+.explorer .file {
+  cursor: pointer;
+}
+
 .editor-wrapper .main {
-  flex: 4;
+  flex: 1;
   display: flex;
   flex-direction: column;
   background-color: #ffffff;
 }
 
 .editor-wrapper .main .tab-wrapper {
-  height: 35px;
+  display: flex;
+  flex-direction: row;
+  height: 40px;
   background-color: #797979;
-  border: 1px solid #eee;
+  border: 1px solid #000000;
+}
+
+.editor-wrapper .main .tab-wrapper .tab {
+  flex: 1;
+  max-width: 100px;
+  cursor: pointer;
+}
+
+.editor-wrapper .main .tab-wrapper .selected {
+  background-color: beige;
 }
 
 .editor-wrapper .main .content-area {
   width: 100%;
-  height: calc(100% - 35px);
+  height: calc(100% - 40px);
   padding: 10px;
   overflow-y: scroll;
 }
