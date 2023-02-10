@@ -43,7 +43,3 @@ html, body {
 .window .head-bar {
   background-color: #8d8d8d;
 }
-
-.selected-window {
-  z-index: 99;
-}

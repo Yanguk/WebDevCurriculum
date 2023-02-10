@@ -6,6 +6,9 @@ const makeElement = (template) => {
 };
 
 class Desktop {
+  element;
+  #units;
+
   constructor({ desktopEl, iconCount, folderCount }) {
     const icons = Array.from(
       { length: iconCount },
@@ -18,14 +21,14 @@ class Desktop {
     );
 
     this.element = desktopEl;
-    this.units = [...icons, ...folders];
+    this.#units = [...icons, ...folders];
   }
 
   init() {
-    this.units.forEach((units) => units.render(this.element));
+    this.#units.forEach((units) => units.render(this.element));
 
     this.#changeAbsolute();
-    this.#AddUnitsEvent();
+    this.#addUnitsEvent();
   }
 
   #changeAbsolute() {
@@ -42,11 +45,11 @@ class Desktop {
     const changePosition = ({ element }) =>
       (element.style.position = 'absolute');
 
-    this.units.forEach(changeCoordinate);
-    this.units.forEach(changePosition);
+    this.#units.forEach(changeCoordinate);
+    this.#units.forEach(changePosition);
   }
 
-  #AddUnitsEvent() {
+  #addUnitsEvent() {
     const addMoveEvent = ({ element }) => {
       element.addEventListener('mousedown', (e) => {
         e.preventDefault();
@@ -74,12 +77,13 @@ class Desktop {
       });
     };
 
-    this.units.forEach(addMoveEvent);
+    this.#units.forEach(addMoveEvent);
   }
 }
 
 class Icon {
   element;
+
   constructor() {}
 
   render(parent) {
@@ -88,6 +92,8 @@ class Icon {
 }
 
 class File extends Icon {
+  element;
+
   constructor(name = '새파일') {
     super();
 
@@ -105,6 +111,9 @@ class File extends Icon {
 }
 
 class Folder extends Icon {
+  element;
+  #window;
+
   constructor(name = '새폴더') {
     super();
 
@@ -119,7 +128,7 @@ class Folder extends Icon {
 		`;
 
     this.element = makeElement(template);
-    this.window = new Window();
+    this.#window = new Window();
   }
 
   render(parent) {
@@ -138,7 +147,7 @@ class Folder extends Icon {
 
   #openWindow() {
     const parent = this.element.parentElement;
-    this.window.render(parent);
+    this.#window.render(parent);
   }
 
   #isOpenWindow() {
@@ -146,7 +155,7 @@ class Folder extends Icon {
     const windows = parent.getElementsByClassName('window');
 
     for (const el of windows) {
-      if (el === this.window.element) {
+      if (el === this.#window.element) {
         return true;
       }
     }
@@ -156,6 +165,10 @@ class Folder extends Icon {
 }
 
 class Window {
+  element;
+  desktop;
+  #isInit;
+
   constructor() {
     const className = 'window';
     const template = `
@@ -174,7 +187,7 @@ class Window {
       iconCount: 2,
     });
 
-    this.isInit = true;
+    this.#isInit = true;
 
     this.#addCloseButtonEvent();
     this.#addMoveEvent();
@@ -183,7 +196,7 @@ class Window {
   render(parent) {
     parent.appendChild(this.element);
 
-    if (this.isInit) {
+    if (this.#isInit) {
       this.desktop.init();
       this.isInit = false;
     }
