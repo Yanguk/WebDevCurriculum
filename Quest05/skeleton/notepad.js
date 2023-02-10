@@ -1,17 +1,11 @@
-let globalId = 1;
-
 class Notepad {
   /* TODO: 그 외에 또 어떤 클래스와 메소드가 정의되어야 할까요? */
   wrapperEl;
-  #fileList;
-  #tapList;
   store;
 
   constructor(wrapperEl) {
-    this.#fileList = [];
-    this.#tapList = [];
-    this.wrapperEl = wrapperEl;
     this.store = new Store();
+    this.wrapperEl = wrapperEl;
     this.template = `
 <section class="explorer">
     <div class="explorer-header">
@@ -28,16 +22,6 @@ class Notepad {
   <div contenteditable=false class="content-area"></div>
 </section>
     `;
-
-    this.store.fileNames.forEach((name) => {
-      const target = this.store.files[name];
-
-      this.#fileList.push(new File({
-        name: target.name,
-        content: target.content,
-        notepad: this,
-      }));
-    });
   }
 
   init() {
@@ -58,9 +42,9 @@ class Notepad {
         }
 
         const targetId = selectFileEl.id;
-        const targetFile = this.#fileList.filter(
-          (file) => file.id === Number(targetId.slice(4))
-        )[0];
+        const targetFile = this.store
+          .getFiles()
+          .filter((file) => file.id === Number(targetId.slice(4)))[0];
 
         targetFile.save();
       });
@@ -70,43 +54,40 @@ class Notepad {
     const newFileButton = this.wrapperEl.querySelector('.new-file-button');
 
     newFileButton.addEventListener('click', (e) => {
-      const fileCount = this.#fileList.length;
-
-      this.#fileList.push(
-        new File({ name: `파일${fileCount + 1}`, notepad: this, content: '' })
-      );
+      this.store.addFile(this);
       this.#fileListRender();
     });
   }
 
   #fileListRender() {
     const fileListEl = this.wrapperEl.querySelector('.file-list');
+    const files = this.store.getFiles();
 
     const makeTemplate = (file) => `
-      <li class="file">
+      <li class="file" id="file${file.id}">
         <img><p>${file.name}</p>
       </li>
     `;
 
-    const fileListTemplate = this.#fileList.reduce(
-      (acc, file) => acc + makeTemplate(file),
+    const fileListTemplate = Object.keys(files).reduce(
+      (acc, fileId) => acc + makeTemplate(files[fileId]),
       ''
     );
 
     fileListEl.innerHTML = fileListTemplate;
 
-    const files = fileListEl.querySelectorAll('.file');
+    const fileEls = fileListEl.querySelectorAll('.file');
 
-    files.forEach((node, idx) => {
+    fileEls.forEach((node, idx) => {
       node.addEventListener('click', (e) => {
-        this.#fileList[idx].show();
+        files[idx].show(this);
       });
     });
   }
 
   activeTab(tab) {
     if (!this.#isExitedTab(tab)) {
-      this.#tapList.push(tab);
+      this.store.addTabs(tab);
     }
 
     const tabWrapper = this.wrapperEl.querySelector('.tab-wrapper');
@@ -116,7 +97,7 @@ class Notepad {
       </li>
     `;
 
-    const template = this.#tapList.reduce((acc, cur) => {
+    const template = this.store.getTabs().reduce((acc, cur) => {
       return (acc += makeTabTemplate(cur));
     }, '');
 
@@ -138,25 +119,27 @@ class Notepad {
           return;
         }
 
-        const tabEl = this.#tapList[idx];
+        const tabEl = this.store.getTabs()[idx];
 
         this.activeTab(tabEl);
-        tabEl.show();
+        tabEl.show(this);
       });
     });
   }
 
   #selectTab(tab) {
-    const tabWrapper = this.wrapperEl.querySelector('.tab-wrapper');
-    const preSelectTab = tabWrapper.querySelector('.selected');
-    preSelectTab?.classList.delete('selected');
+    const preSelectTabs = this.wrapperEl.querySelectorAll('.selected');
 
-    const target = tabWrapper.querySelector(`#file${tab.id}`);
-    target.classList.add('selected');
+    preSelectTabs.forEach((tab) => {
+      tab.classList.remove('selected')
+    });
+
+    const targets = this.wrapperEl.querySelectorAll(`#file${tab.id}`);
+    targets.forEach((target) => target.classList.add('selected'));
   }
 
-  #isExitedTab(tab) {
-    return !!this.wrapperEl.querySelector(`#file${tab.id}`);
+  #isExitedTab(file) {
+    return !!this.wrapperEl.querySelector(`.tab-wrapper #file${file.id}`);
   }
 
   getMainContent() {
@@ -165,12 +148,16 @@ class Notepad {
 }
 
 class LocalStorageModel {
-  #key;
+  #itemKey;
+  #idKey;
   #store;
+  #uniqId;
 
   constructor() {
-    this.#key = 'list';
-    this.#store = JSON.parse(window.localStorage.getItem(this.#key)) || {};
+    this.#itemKey = 'list';
+    this.#idKey = 'id';
+    this.#store = JSON.parse(window.localStorage.getItem(this.#itemKey)) || {};
+    this.#uniqId = JSON.parse(window.localStorage.getItem(this.#idKey)) || 1;
   }
 
   getAll() {
@@ -179,51 +166,101 @@ class LocalStorageModel {
 
   save(key, data) {
     this.#store[key] = data;
-    window.localStorage.setItem(this.#key, JSON.stringify(this.#store));
+    window.localStorage.setItem(this.#itemKey, JSON.stringify(this.#store));
   }
 
   delete(key) {
     delete this.#store[key];
-    window.localStorage.setItem(this.#key, JSON.stringify(this.#store));
+    window.localStorage.setItem(this.#itemKey, JSON.stringify(this.#store));
+  }
+
+  getId() {
+    this.#uniqId += 1;
+    window.localStorage.setItem(this.#idKey, this.#uniqId);
+
+    return this.#uniqId;
   }
 }
 
 class Store {
-  constructor() {
-    this.localStorageModel = new LocalStorageModel();
-    const fileObjs = this.localStorageModel.getAll();
-    this.fileNames = Object.keys(this.localStorageModel.getAll());
-    this.files = this.localStorageModel.getAll();
-  }
+  #localStorageModel;
+  #files;
+  #tabs;
 
-  getAll() {
-    console.log(this.localStorageModel.getAll());
+  constructor() {
+    this.#localStorageModel = new LocalStorageModel();
+    this.#files = [];
+    this.#tabs = [];
+
+    const files = this.#localStorageModel.getAll();
+
+    Object.keys(files).forEach((id) => {
+      const targetInfo = files[id];
+
+      const file = new File({ id, name: targetInfo.name, content: targetInfo.content });
+
+      this.#files.push(file);
+    });
   }
 
   save(file) {
     const info = {
+      id: file.id,
       name: file.name,
       content: file.content,
     };
 
-    this.localStorageModel.save(file.name, info);
+    this.#localStorageModel.save(file.id, info);
+  }
+
+  delete(file) {
+    this.#localStorageModel.delete(file.id);
+  }
+
+  getId() {
+    return this.#localStorageModel.getId();
+  }
+
+  getFiles() {
+    return this.#files;
+  }
+
+  addFile(notepad) {
+    const newId = notepad.store.getId();
+
+    const file = new File({
+      notepad,
+      id: notepad.store.getId(),
+      name: `파일${newId}`,
+      content: '',
+    });
+
+    this.#files.push(file);
+    this.save(file);
+  }
+
+  getTabs() {
+    return this.#tabs;
+  }
+
+  addTabs(file) {
+    return this.#tabs.push(file);
   }
 }
 
 class File {
-  constructor({ name, notepad, content = '' }) {
-    this.id = globalId++;
-    this.notepad = notepad;
+  constructor({ id, name, content = '' }) {
+    this.id = id;
     this.name = name;
     this.content = content;
   }
 
-  show() {
-    const contentArea = this.notepad.wrapperEl.querySelector('.content-area');
+  show(notepad) {
+    const contentArea = notepad.wrapperEl.querySelector('.content-area');
 
     contentArea.textContent = this.content;
     contentArea.setAttribute('contenteditable', true);
-    this.notepad.activeTab(this);
+    notepad.activeTab(this);
   }
 
   save() {

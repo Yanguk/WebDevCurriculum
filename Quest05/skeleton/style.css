@@ -60,7 +60,7 @@ ul, ol, li {
   cursor: pointer;
 }
 
-.editor-wrapper .main .tab-wrapper .selected {
+.selected {
   background-color: beige;
 }
 
