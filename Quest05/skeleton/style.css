@@ -1,3 +1,45 @@
 * {
-	/* TODO: 필요한 CSS를 채워넣어 보세요! */
+  box-sizing: border-box;
+  margin: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+}
+
+.editor-wrapper {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.editor-wrapper .explorer-header {
+  height: 35px;
+  background-color: #797979;
+}
+
+.editor-wrapper .explorer {
+  flex: 1;
+  background-color: #999;
+}
+
+.editor-wrapper .main {
+  flex: 4;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+}
+
+.editor-wrapper .main .tab-wrapper {
+  height: 35px;
+  background-color: #797979;
+  border: 1px solid #eee;
+}
+
+.editor-wrapper .main .content-area {
+  width: 100%;
+  height: calc(100% - 35px);
+  padding: 10px;
+  overflow-y: scroll;
 }
