@@ -84,7 +84,9 @@ class Desktop {
 class Icon {
   element;
 
-  constructor() {}
+  constructor(element) {
+    this.element = element;
+  }
 
   render(parent) {
     parent.appendChild(this.element);
@@ -92,11 +94,7 @@ class Icon {
 }
 
 class File extends Icon {
-  element;
-
   constructor(name = '새파일') {
-    super();
-
     const imgSrc = './assets/file.png';
     const className = 'unit icon';
     const template = `
@@ -106,17 +104,15 @@ class File extends Icon {
 			</article>
 		`;
 
-    this.element = makeElement(template);
+    const element = makeElement(template);
+    super(element);
   }
 }
 
 class Folder extends Icon {
-  element;
   #window;
 
   constructor(name = '새폴더') {
-    super();
-
     const imgSrc = './assets/folder.png';
     const className = 'unit folder';
 
@@ -127,7 +123,7 @@ class Folder extends Icon {
 			</article>
 		`;
 
-    this.element = makeElement(template);
+    super(makeElement(template));
     this.#window = new Window();
   }
 
