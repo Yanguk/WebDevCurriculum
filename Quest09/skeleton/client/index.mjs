@@ -22,6 +22,8 @@ const requestHandler = (req, res) => {
 
       res.writeHead(200, { 'Content-Type': 'text/html' }).end(template);
     }
+  } else {
+    res.writeHead(404).send('Not Found');
   }
 };
 
