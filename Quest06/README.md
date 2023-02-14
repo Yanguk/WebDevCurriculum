@@ -62,7 +62,7 @@
 - tracert(Windows가 아닌 경우 traceroute) 명령을 통해 www.google.com 까지 가는 경로를 찾아 보세요.
   - 어떤 IP주소들이 있나요?
   - 그 IP주소들은 어디에 위치해 있나요?
-    > - 검색사이트 https://xn--c79as89aj0e29b77z.xn--3e0b707e/ > ![image](./%08traceroute.png)
+    > - 검색사이트 https://xn--c79as89aj0e29b77z.xn--3e0b707e/ ![image](./%08traceroute.png)
     > - 한국 ip에서는 성남시 분당구에 있는 케이티가 나옵니다.
 - Wireshark를 통해 www.google.com 으로 요청을 날렸을 떄 어떤 TCP 패킷이 오가는지 확인해 보세요
   > - 어떻게 봐야하는건지 아직 잘모르겠습니다.
