@@ -50,6 +50,7 @@ const server = http.createServer((req, res) => {
 
       req.on('data', (chuck) => {
         console.log(`received chuck! ${chuck.length}`);
+
         appendFileSync(filename, chuck);
       });
 
@@ -74,14 +75,14 @@ const server = http.createServer((req, res) => {
         'Content-Length': stat.size,
       });
 
-      // rs.pipe(res);
-      readStream.on('data', (chuck) => {
-        res.write(chuck);
-      });
+      readStream.pipe(res);
+      // readStream.on('data', (chuck) => {
+      //   res.write(chuck);
+      // });
 
-      readStream.on('end', () => {
-        res.end();
-      });
+      // readStream.on('end', () => {
+      //   res.end();
+      // });
 
       return;
     }
