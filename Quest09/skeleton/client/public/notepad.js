@@ -241,6 +241,7 @@ class LocalStorageModel {
 
   getId() {
     this.#uniqId += 1;
+
     window.localStorage.setItem(this.#idKey, this.#uniqId);
 
     return this.#uniqId;
@@ -270,8 +271,6 @@ class Store {
     });
 
     this.#files = files;
-
-    console.log(this.#files);
   }
 
   async save(file) {
@@ -297,7 +296,7 @@ class Store {
 
     const file = new File({
       notepad,
-      id: notepad.store.getId(),
+      id: newId,
       name: `파일${newId}.txt`,
       content: '',
     });
@@ -328,7 +327,7 @@ class File {
 
   show(notepad) {
     const contentArea = notepad.wrapperEl.querySelector('.content-area');
-    console.log(this.content);
+
     contentArea.textContent = this.content;
     contentArea.setAttribute('contenteditable', true);
     notepad.activeTab(this);

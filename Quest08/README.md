@@ -25,7 +25,7 @@
   >   * 데이터는 body에 담아서 전송
   >   * 캐싱이 되지 않음
   >   * 브라우저 히스토리에 남지 않음
-  >   * POST에서는 멱등성이 보장되지 낳음
+  >   * POST에서는 멱등성이 보장되지 않음
   >     - 멱등성: 같은 행위를 반복하더라도 같은 효과를 가짐
 
   * 다른 HTTP 메소드에는 무엇이 있나요?
@@ -46,7 +46,7 @@
 
 * HTTP 서버에 GET과 POST를 통해 데이터를 보내려면 어떻게 해야 하나요?
   > * http 메세지로 데이터를 보내야함
-  >![이미지](./assets/requestHeader.png)
+  >![이미지](./assets/http.png)
   > MDN https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages
   * HTTP 요청의 `Content-Type` 헤더는 무엇인가요?
     > * 브라우저는 content-type헤더를 기준으로 http 메세지에 담긴 데이터를 분석과 파싱을 하기 때문에 데이터의 유형을 알려주는 역할을 합니다.

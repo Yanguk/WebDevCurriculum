@@ -28,5 +28,5 @@ const requestHandler = (req, res) => {
 };
 
 createServer(requestHandler).listen(PORT, () => {
-  console.log(`listening on ${PORT}`);
+  console.log(`listening on port ${PORT}`);
 });

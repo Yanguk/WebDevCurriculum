@@ -42,7 +42,7 @@
 
   - 브라우저의 `XMLHttpRequest` 객체는 무엇이고 어떻게 동작하나요?
     > - fetch가 나오기 이전에 ajax요청을 할때 사용되었습니다.
-    > - 현재의 promise기반과는 달리 이벤트기반의 형식임
+    > - 현재의 Promise기반과는 달리 이벤트기반의 형식임
   - `fetch` API는 무엇이고 어떻게 동작하나요?
     > - 위의 XHR을 대체하며 비동기 요청을 좀더 쓰기 편하게해줌.
     > - Promise 기반으로 동작하며, 응답결과는 Response 객체
@@ -71,7 +71,7 @@
 
 - CORS란 무엇인가요? 이러한 기능이 왜 필요할까요? CORS는 어떻게 구현될까요?
   > - 브라우저는 SOP(same origin policy)를 지키고있으며, 같은 도메인의 서버에서만 데이터를 받아올수가 있습니다.
-  > - 이에 다른 출처의 자원도 교류하기위해서 나온 것이 CORS(cross origin resource)정책입니다.
+  > - 다른 출처의 자원도 교류하기위해서 나온 것이 CORS(cross origin resource)정책입니다.
   > - 브라우저는 요청을 날리기전에 preflight를 날려서 응답을 확인하게 되는데, 이에 따른 서버의 응답에서 헤더에 Access-control-allow-origin을 해당 클라이언트 도메인을 명시해주고, 허용가능한 http 메소드도 명시해줘야 합니다. (Access-control-allow-methods)
 
 ## Quest

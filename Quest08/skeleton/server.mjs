@@ -1,7 +1,6 @@
 import http from 'http';
 import { parse, unescape } from 'querystring';
 import { appendFileSync, createReadStream, statSync } from 'fs';
-import { extname } from 'path';
 
 const server = http.createServer((req, res) => {
   /* TODO: 각각의 URL들을 어떻게 처리하면 좋을까요? */
@@ -105,4 +104,8 @@ const server = http.createServer((req, res) => {
   res.setHeader('Content-Type', 'text/plain; charset=utf-8').end('Hello 404');
 });
 
-server.listen(8000);
+const PORT = 8000;
+
+server.listen(PORT, () => {
+  console.log(`listening on Port ${PORT}`)
+});
