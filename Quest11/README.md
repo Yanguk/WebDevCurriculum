@@ -25,7 +25,7 @@
   > * 오라클
   > * 마리아DB
   > * IBM Db2 ...
-  > ![db인기순위](./%08db.png)
+  > ![db인기순위](./asset/%08db.png)
   > db인기순위 보기:  https://db-engines.com/en/ranking
   * Relational Database 외에 다른 DB에는 어떤 것들이 있을까요?
     > * NoSQL: MongoDB, hbase
@@ -35,11 +35,11 @@
   > * 많이 쓰이는 인덱싱 자료구조에는 B-tree(비 트리), B+tree(비 플러스 트리)가 있습니다.
   > * 둘다 탐색속도가 logN인 Binary tree에서 발전된 트리 모양입니다.
   > #### B-tree
-  > ![b-tree](./b-tree.png)
+  > ![b-tree](./asset/b-tree.png)
   > - 모든 리프노드들이 같은 레벨을 가지도록 자동으로 균형을 마주는 트리입니다.
   > - 군형이 맞춰져있고 하나의 노드에 한개 이상의 데이터를 가지고 있어서 이진트리보다 적은 횟수로 많은 데이터를 찾을수가 있습니다.
   > #### B+tree
-  > ![b+tree](./b%2Btree.png)
+  > ![b+tree](./asset/b%2Btree.png)
   > - b-tree에서 확장된 개념으로, 브랜치 노드에 key만 담아두고, 오직 리프노드에만 key와 데이터를 저장하고, 리프노드끼리 Linked List로 연결이 되어있는 형식입니다.
   > - leaf 노드 끼리 연결리스트로 연결되어있어서 범위 탐색에 매우 유리합니다. 단점으로는 무조건 leaf노드까지 내려가야 데이터를 찾을수 있다는 점 입니다.
   > <br>
@@ -114,5 +114,5 @@
 * 이전에 쓰이던 해시함수들에는 어떤 것이 있을까요? 패스워드 해싱의 추세의 역사는 어떻게 이어져왔나요?
   > - 이전에 쓰이던 MD5, SHA-0, SHA-1 등등이 있습니다.
   > - 기존의 해시함수가 시간이 지나면서 다른 인풋값에 같은 값이 나오는 해시충돌이 발견되면서 못쓰게되었고, 기존의 해싱함수를 개선하면서 대체할수 있는 다른 해싱함수들도 등장하게 되었습니다.
-  > ![hash](./%08hash.png)
+  > ![hash](./asset/%08hash.png)
   > 출저: 한국인터넷진흥원 https://seed.kisa.or.kr/kisa/intro/EgovHistory.do

@@ -23,12 +23,11 @@ const userInfo = {
 const checkIsLogin = (req, res, next) => {
   // jwt쿠키 확인
   const token = req.headers.authorization.split(' ')[1];
-  console.log('토큰!!!!!!!', token);
 
   if (token) {
     // toDo: 검증되지않은 토큰일때 에러처리
     const decoded = jwt.verify(token, PRIVATE_KEY);
-    console.log(decoded);
+
     return res.json({ ok: true, id: decoded.id });
   }
 
@@ -77,6 +76,7 @@ const loginWithSession = (req, res, next) => {
 
   const sessionCookieOption = {
     httpOnly: true,
+    // secure: true,
   };
 
   res.cookie('session', sessionId, sessionCookieOption);
@@ -91,8 +91,8 @@ const logout = (req, res, next) => {
   // session에 있는 유저 정보 삭제 및 쿠키에 있는 세션 삭제;
   const sessionId = cookieObj['session'];
   session.delete(sessionId);
-  res.clearCookie('session');
 
+  res.clearCookie('session');
   res.json({ ok: true, message: '로그아웃' });
 };
 
