@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const dbModel = require('../model/DbModel');
 
-router.get('/files', async (req, res, next) => {
+router.get('/', async (req, res, next) => {
   try {
     const files = await dbModel.getAll();
 
@@ -11,7 +11,7 @@ router.get('/files', async (req, res, next) => {
   }
 });
 
-router.post('/file', async (req, res, next) => {
+router.post('/', async (req, res, next) => {
   try {
     const { name, content } = req.body;
 
@@ -28,7 +28,7 @@ router.post('/file', async (req, res, next) => {
   }
 });
 
-router.put('/file', async (req, res, next) => {
+router.put('/', async (req, res, next) => {
   try {
     const { oldName, newName } = req.body;
 
@@ -47,7 +47,7 @@ router.put('/file', async (req, res, next) => {
   }
 });
 
-router.delete('/file', async (req, res, next) => {
+router.delete('/', async (req, res, next) => {
   try {
     const { name } = req.body;
     console.log(req.body);

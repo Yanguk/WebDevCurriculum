@@ -1,27 +1,19 @@
 const express = require('express');
 const app = express();
 
-const indexRouter = require('./router');
+const fileRouter = require('./routes/file.route');
+const loginRouter = require('./routes/auth.route');
+const setCorsHeader = require('./routes/middlewares/setCorsHeader');
+const { PORT } = require('./libs/constant');
 
-const PROT = 8000;
-const CLIENT_URL = 'http://localhost:3000';
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(setCorsHeader);
 
-app.use('/', (req, res, next) => {
-  res.header("Access-Control-Allow-Headers", "Authorization, Content-Type");
-  res.header("Access-Control-Allow-Methods", "GET,OPTIONS,POST,PUT,DELETE");
-  res.header("Access-Control-Allow-Origin", CLIENT_URL);
-
-  if (req.method === "OPTIONS") {
-    return res.json();
-  }
-
-  return next();
-});
-
-app.use('/', indexRouter);
+app.use('/file', fileRouter);
+app.use('/auth', loginRouter);
 
 app.use((req, res, next) => {
   const err = new Error('Not Found');
@@ -39,6 +31,6 @@ app.use((err, req, res, next) => {
   res.status(status).json({ error: message });
 });
 
-app.listen(PROT, () => {
-  console.log(`listening on port ${PROT}`);
+app.listen(PORT, () => {
+  console.log(`listening on port ${PORT}`);
 });

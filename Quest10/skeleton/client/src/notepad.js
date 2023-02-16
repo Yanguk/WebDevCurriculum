@@ -1,3 +1,6 @@
+import apiModel from './models/apiModel';
+import Api from './models/apiModel';
+
 export default class Notepad {
   wrapperEl;
   store;
@@ -10,8 +13,9 @@ export default class Notepad {
     <div class="explorer-header">
       <p>EXPLORER</p>
       <div class="button-wrapper">
-        <button class="new-file-button">새파일 추가</button>
-        <button class="save-button">저장하기</button>
+        <button class="new-file-button">Add file</button>
+        <button class="save-button">Save</button>
+        <button class="logout-button">logout</button>
       </div>
     </div>
     <ul class="file-list"></ul>
@@ -29,6 +33,16 @@ export default class Notepad {
     this.#fileListRender();
     this.#addNewFileButtonEvent();
     this.#addSaveButtonEvent();
+    this.#addLogoutButtonEvent();
+  }
+
+  #addLogoutButtonEvent() {
+    const logoutButton = this.wrapperEl.querySelector('.logout-button');
+    logoutButton.addEventListener('click', async (e) => {
+      await apiModel.logout();
+
+      window.location.reload();
+    });
   }
 
   #addSaveButtonEvent() {
@@ -278,7 +292,7 @@ class Store {
   }
 
   async delete(fileName) {
-    await Api.delete(fileName);
+    await Api.deleteFile(fileName);
     await this.update();
   }
 
@@ -339,46 +353,3 @@ class File {
 }
 
 const apiUrl = 'http://localhost:8000';
-
-class Api {
-  static async getAll() {
-    try {
-      const response = await fetch(`${apiUrl}/files`);
-      const data = await response.json();
-
-      return data;
-    } catch (err) {
-      console.error('서버 연결을 확인해주세요');
-    }
-  }
-
-  static async postFile({ name, content }) {
-    const response = await fetch(`${apiUrl}/file`, {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify({ name, content }),
-    });
-
-    const data = await response.json();
-
-    return data.ok;
-  }
-
-  static async delete(name) {
-    const response = await fetch(`${apiUrl}/file`, {
-      method: 'delete',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify({ name }),
-    });
-
-    const data = await response.json();
-
-    return data.ok;
-  }
-}
