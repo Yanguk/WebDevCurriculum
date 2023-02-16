@@ -1,4 +1,5 @@
-import { SERVER_URL } from '../lib/constants';
+import { parseCookies } from '../libs';
+import { SERVER_URL } from '../libs/constants';
 
 const getAll = async () => {
   try {
@@ -44,17 +45,16 @@ const deleteFile = async (name) => {
 // 로그인을 하여서 쿠키를 얻어옴
 const loginJWT = async (body) => {
   try {
-    await fetch(`${SERVER_URL}/auth/login/jwt`, {
+    const response = await fetch(`${SERVER_URL}/auth/login/jwt`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
       },
-      credentials: 'include',
       body: JSON.stringify(body),
     });
 
-    return true;
+    return response.json();
   } catch (err) {
     console.error(err);
 
@@ -84,12 +84,19 @@ const loginSession = async (body) => {
 
 const loginCheck = async () => {
   try {
+    const tokenInfo = parseCookies(document.cookie);
+    const token = tokenInfo['jwt'] ?? '';
+
     // credentials 이란 쿠키, auth 등등 을 말하며 크로스오리진에서 가능할라면 include속성을 줍니다.
     const response = await fetch(`${SERVER_URL}/auth`, {
-      credentials: 'include'
+      credentials: 'include',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     const result = await response.json();
+
     return result.ok;
   } catch (err) {
     console.error('로그인 체크 에러');
@@ -99,14 +106,23 @@ const loginCheck = async () => {
 };
 
 const logout = async () => {
+  const tokenInfo = parseCookies(document.cookie);
+  const token = tokenInfo['jwt'];
+
+  // jwt: 클라이언트에서 토큰삭제;
+  if (token) {
+    document.cookie = 'jwt=; max-age=0;';
+
+    return;
+  }
+
+  // session: 서버에서 세션 삭제;
   const response = await fetch(`${SERVER_URL}/auth/logout`, {
     method: 'POST',
-    credentials: 'include'
+    credentials: 'include',
   });
 
-  const result = await response.json();
-
-  return result;
+  await response.json();
 };
 
 export default {

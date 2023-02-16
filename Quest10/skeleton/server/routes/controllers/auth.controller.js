@@ -21,17 +21,20 @@ const userInfo = {
 };
 
 const checkIsLogin = (req, res, next) => {
-  const cookieObj = parseCookies(req.headers.cookie);
-
   // jwt쿠키 확인
-  if (cookieObj['jwt']) {
-    // toDo: 검증되지않은 토큰일때 에러처리
-    const decoded = jwt.verify(cookieObj['jwt'], PRIVATE_KEY);
+  const token = req.headers.authorization.split(' ')[1];
+  console.log('토큰!!!!!!!', token);
 
+  if (token) {
+    // toDo: 검증되지않은 토큰일때 에러처리
+    const decoded = jwt.verify(token, PRIVATE_KEY);
+    console.log(decoded);
     return res.json({ ok: true, id: decoded.id });
   }
 
   // jwt가 없을때 세션 로그인 확인
+  const cookieObj = parseCookies(req.headers.cookie);
+
   if (cookieObj['session']) {
     const sessionId = cookieObj['session'];
 
@@ -43,7 +46,7 @@ const checkIsLogin = (req, res, next) => {
   res.json({ ok: false });
 };
 
-const loginWithJWT = (req, res, next) => {
+const loginAndGetJWT = (req, res, next) => {
   const { id, password } = req.body;
 
   if (!userInfo[id] || userInfo[id].password !== password) {
@@ -54,16 +57,6 @@ const loginWithJWT = (req, res, next) => {
 
   const token = jwt.sign({ id }, PRIVATE_KEY);
 
-  const expiresIn = 60 * 60 * 24 * 1000;
-
-  const cookieOption = {
-    maxAge: expiresIn,
-    httpOnly: true,
-    // secure: true,
-    // sameSite: 'None',
-  };
-
-  res.cookie('jwt', token, cookieOption);
   res.json({ token });
 };
 
@@ -105,7 +98,7 @@ const logout = (req, res, next) => {
 
 module.exports = {
   checkIsLogin,
-  loginWithJWT,
+  loginWithJWT: loginAndGetJWT,
   loginWithSession,
   logout,
 };

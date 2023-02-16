@@ -29,7 +29,9 @@ const render = () => {
 async function jwtLogin(e) {
   const formData = getInputValue();
 
-  await apiModel.loginJWT(formData);
+  const { token } = await apiModel.loginJWT(formData);
+
+  document.cookie = `jwt=${token}`;
 
   window.location.reload();
 }
