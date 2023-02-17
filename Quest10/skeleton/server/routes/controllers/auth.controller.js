@@ -4,8 +4,6 @@ const jwt = require('jsonwebtoken');
 
 const PRIVATE_KEY = 'secret';
 
-const userList = ['heo', 'kim', 'park'];
-
 const password = '1234';
 
 const userInfo = {
@@ -45,9 +43,11 @@ const checkIsLogin = (req, res, next) => {
   res.json({ ok: false });
 };
 
+// 토큰!
 const loginAndGetJWT = (req, res, next) => {
   const { id, password } = req.body;
 
+  // 유효성 검사...
   if (!userInfo[id] || userInfo[id].password !== password) {
     return res
       .status(400)
@@ -56,23 +56,21 @@ const loginAndGetJWT = (req, res, next) => {
 
   const token = jwt.sign({ id }, PRIVATE_KEY);
 
-  res.json({ token });
+  res.json({ ok: true, token });
 };
 
+// 세션!
 const loginWithSession = (req, res, next) => {
-  const { id, password } = req.body;
+  const { id: userId, password } = req.body;
 
-  // 유저 검증...
-  if (!userInfo[id] || userInfo[id].password !== password) {
+  // 유효성 검사...
+  if (!userInfo[userId] || userInfo[userId].password !== password) {
     return res
       .status(400)
       .json({ ok: false, message: '유저정보가 잘못되었습니다.' });
   }
 
-  // 주로 passport 의 인증 라이브러리와 express-session 이라는 라이브러리를 사용하지만
-  // 여기선 학습의도로 간단하게 추상화만 시켜서 진행하였음.
-  // 존재하는 유저면 session Id를 쿠키에 넣어서 발급
-  const sessionId = session.set(id);
+  const sessionId = session.set(userId);
 
   const sessionCookieOption = {
     httpOnly: true,

@@ -1,23 +1,19 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../libs/db.config');
 
-const File = sequelize.define('File', {
-  owner: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  name: {
+const User = sequelize.define('User', {
+  userId: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  content: {
+  password: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  activeTab: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
+  salt: {
+    type: DataTypes.STRING,
+    allowNull: false,
   },
 });
 
-module.exports = File;
+module.exports = User;

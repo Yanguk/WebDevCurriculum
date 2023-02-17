@@ -1,47 +1,6 @@
 import { parseCookies } from '../libs';
 import { SERVER_URL } from '../libs/constants';
 
-const getAll = async () => {
-  try {
-    const response = await fetch(`${SERVER_URL}/file`);
-    const data = await response.json();
-
-    return data;
-  } catch (err) {
-    console.error('서버 연결을 확인해주세요');
-  }
-};
-
-const postFile = async ({ name, content }) => {
-  const response = await fetch(`${SERVER_URL}/file`, {
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    body: JSON.stringify({ name, content }),
-  });
-
-  const data = await response.json();
-
-  return data.ok;
-};
-
-const deleteFile = async (name) => {
-  const response = await fetch(`${SERVER_URL}/file`, {
-    method: 'delete',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    body: JSON.stringify({ name }),
-  });
-
-  const data = await response.json();
-
-  return data.ok;
-};
-
 const signup = async (body) => {
   try {
     const response = await fetch(`${SERVER_URL}/auth/signup`, {
@@ -113,11 +72,11 @@ const loginCheck = async () => {
         Authorization: `Bearer ${token}`,
       },
     });
-
     const result = await response.json();
 
-    return result.ok;
+    return result;
   } catch (err) {
+    console.error(err);
     console.error('로그인 체크 에러');
 
     return false;
@@ -145,9 +104,6 @@ const logout = async () => {
 };
 
 export default {
-  getAll,
-  postFile,
-  deleteFile,
   signup,
   loginJWT,
   loginCheck,

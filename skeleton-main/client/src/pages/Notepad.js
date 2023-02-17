@@ -1,5 +1,5 @@
-import apiModel from './models/apiModel';
-import Api from './models/apiModel';
+import Store from '../common/store';
+import authApi from '../api/auth.api';
 
 export default class Notepad {
   wrapperEl;
@@ -39,7 +39,7 @@ export default class Notepad {
   #addLogoutButtonEvent() {
     const logoutButton = this.wrapperEl.querySelector('.logout-button');
     logoutButton.addEventListener('click', async (e) => {
-      await apiModel.logout();
+      await authApi.logout();
 
       window.location.reload();
     });
@@ -63,7 +63,8 @@ export default class Notepad {
           .getFiles()
           .filter((file) => `file${file.id}` === targetId)[0];
 
-        targetFile.save(this);
+        targetFile.save(this.getMainContent());
+        this.save(targetFile);
       });
   }
 
@@ -71,7 +72,7 @@ export default class Notepad {
     const newFileButton = this.wrapperEl.querySelector('.new-file-button');
 
     newFileButton.addEventListener('click', async (e) => {
-      await this.store.addFile(this);
+      this.store.addFile(this);
       this.#fileListRender();
     });
   }
@@ -106,6 +107,7 @@ export default class Notepad {
           .filter((file) => `file${file.id}` === targetId)[0];
 
         targetFile.show(this);
+        this.activeTab(targetFile);
       });
     });
 
@@ -224,132 +226,3 @@ export default class Notepad {
     return this.wrapperEl.querySelector('.content-area').textContent;
   }
 }
-
-class LocalStorageModel {
-  #itemKey;
-  #idKey;
-  #store;
-  #uniqId;
-
-  constructor() {
-    this.#itemKey = 'list';
-    this.#idKey = 'id';
-    this.#store = JSON.parse(window.localStorage.getItem(this.#itemKey)) || {};
-    this.#uniqId = JSON.parse(window.localStorage.getItem(this.#idKey)) || 1;
-  }
-
-  getAll() {
-    return this.#store;
-  }
-
-  save(key, data) {
-    this.#store[key] = data;
-    window.localStorage.setItem(this.#itemKey, JSON.stringify(this.#store));
-  }
-
-  delete(key) {
-    delete this.#store[key];
-    window.localStorage.setItem(this.#itemKey, JSON.stringify(this.#store));
-  }
-
-  getId() {
-    this.#uniqId += 1;
-
-    window.localStorage.setItem(this.#idKey, this.#uniqId);
-
-    return this.#uniqId;
-  }
-}
-
-class Store {
-  #localStorageModel;
-  #files;
-  #tabs;
-
-  constructor() {
-    this.#localStorageModel = new LocalStorageModel();
-    this.#files = [];
-    this.#tabs = [];
-  }
-
-  async update() {
-    const data = await Api.getAll();
-
-    const files = data.map(({ name, content }, idx) => {
-      return new File({
-        id: idx,
-        name,
-        content,
-      });
-    });
-
-    this.#files = files;
-  }
-
-  async save(file) {
-    await Api.postFile(file);
-    await this.update();
-  }
-
-  async delete(fileName) {
-    await Api.deleteFile(fileName);
-    await this.update();
-  }
-
-  getId() {
-    return this.#localStorageModel.getId();
-  }
-
-  getFiles() {
-    return this.#files;
-  }
-
-  addFile(notepad) {
-    const newId = notepad.store.getId();
-
-    const file = new File({
-      notepad,
-      id: newId,
-      name: `파일${newId}.txt`,
-      content: '',
-    });
-
-    return this.save(file);
-  }
-
-  getTabs() {
-    return this.#tabs;
-  }
-
-  addTabs(file) {
-    return this.#tabs.push(file);
-  }
-
-  removeTab(id) {
-    this.#tabs = this.#tabs.filter((file) => `file${file.id}` !== id);
-    this.update();
-  }
-}
-
-class File {
-  constructor({ id, name, content = '' }) {
-    this.id = id;
-    this.name = name;
-    this.content = content;
-  }
-
-  show(notepad) {
-    const contentArea = notepad.wrapperEl.querySelector('.content-area');
-
-    contentArea.textContent = this.content;
-    contentArea.setAttribute('contenteditable', true);
-    notepad.activeTab(this);
-  }
-
-  save(notepad) {
-    this.content = notepad.getMainContent();
-    notepad.store.save(this);
-  }
-}
-
-const apiUrl = 'http://localhost:8000';

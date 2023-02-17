@@ -1,51 +1,9 @@
 import { parseCookies } from '../libs';
 import { SERVER_URL } from '../libs/constants';
 
-const getAll = async () => {
+const signup = async (body) => {
   try {
-    const response = await fetch(`${SERVER_URL}/file`);
-    const data = await response.json();
-
-    return data;
-  } catch (err) {
-    console.error('서버 연결을 확인해주세요');
-  }
-};
-
-const postFile = async ({ name, content }) => {
-  const response = await fetch(`${SERVER_URL}/file`, {
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    body: JSON.stringify({ name, content }),
-  });
-
-  const data = await response.json();
-
-  return data.ok;
-};
-
-const deleteFile = async (name) => {
-  const response = await fetch(`${SERVER_URL}/file`, {
-    method: 'delete',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    body: JSON.stringify({ name }),
-  });
-
-  const data = await response.json();
-
-  return data.ok;
-};
-
-// 로그인을 하여서 쿠키를 얻어옴
-const loginJWT = async (body) => {
-  try {
-    const response = await fetch(`${SERVER_URL}/auth/login/jwt`, {
+    const response = await fetch(`${SERVER_URL}/auth/signup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -54,15 +12,32 @@ const loginJWT = async (body) => {
       body: JSON.stringify(body),
     });
 
-    // { ok: true, token: 'eyJhbGc...' }
-    const result = await response.json();
-
-    return result;
+    return response.json();
   } catch (err) {
     console.error(err);
 
     return false;
   }
+};
+
+// 로그인을 하여서 쿠키를 얻어옴
+const loginJWT = async (body) => {
+  const response = await fetch(`${SERVER_URL}/auth/login/jwt`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  const data = await response.json();
+
+  if (!data.ok) {
+    throw new Error('로그인실패');
+  }
+
+  return data;
 };
 
 const loginSession = async (body) => {
@@ -97,11 +72,11 @@ const loginCheck = async () => {
         Authorization: `Bearer ${token}`,
       },
     });
-
     const result = await response.json();
 
-    return result.ok;
+    return result;
   } catch (err) {
+    console.error(err);
     console.error('로그인 체크 에러');
 
     return false;
@@ -129,9 +104,7 @@ const logout = async () => {
 };
 
 export default {
-  getAll,
-  postFile,
-  deleteFile,
+  signup,
   loginJWT,
   loginCheck,
   logout,
