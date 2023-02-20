@@ -18,7 +18,7 @@ const render = () => {
     </section>
   `;
 
-  document.body.innerHTML = template;
+  document.querySelector('#root').innerHTML = template;
 
   addAuthButtonEvent();
 };

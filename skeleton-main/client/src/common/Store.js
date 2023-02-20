@@ -3,14 +3,27 @@ import File from './File';
 import LocalStorageModel from './LocalStorage';
 
 export default class Store {
+  #store;
   #localStorageModel;
   #files;
   #tabs;
 
   constructor() {
+    if (this.#store) {
+      throw new Error('getInstance로 접근해주세요');
+    }
+
     this.#localStorageModel = new LocalStorageModel();
     this.#files = [];
     this.#tabs = [];
+  }
+
+  static getInstance() {
+    if (!this.#store) {
+      this.#store = new Store();
+    }
+
+    return this.#store;
   }
 
   async update() {

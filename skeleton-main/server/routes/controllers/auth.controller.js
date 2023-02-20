@@ -87,7 +87,7 @@ const loginWithSession = async (req, res, next) => {
     res.cookie('session', sessionId, sessionCookieOption);
     res.json({ ok: true, message: '로그인 세션' });
   } catch (err) {
-    res.state(400).json({ ok: false, message: err.message });
+    res.status(400).json({ ok: false, message: err.message });
   }
 };
 

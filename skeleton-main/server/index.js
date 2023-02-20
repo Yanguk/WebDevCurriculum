@@ -39,13 +39,15 @@ app.use((err, req, res, next) => {
   res.status(status).json({ error: message });
 });
 
-// http.createServer(app).listen(HTTP_PORT, () => {
-//   console.log(`listening on port ${HTTP_PORT}`);
-// });
+http.createServer(app).listen(HTTP_PORT, () => {
+  console.log(`listening on port HTTP ${HTTP_PORT}`);
+});
 
 const options = {
   key: fs.readFileSync('./localhost-key.pem'),
   cert: fs.readFileSync('./localhost.pem'),
 };
 
-https.createServer(options, app).listen(HTTPS_PORT);
+https.createServer(options, app).listen(HTTPS_PORT, () => {
+  console.log(`listening on port HTTPS ${HTTPS_PORT}`);
+});
