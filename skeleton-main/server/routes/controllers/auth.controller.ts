@@ -1,3 +1,6 @@
+import { RequestHandler } from "express";
+import UserRequest from "../../types/UserRequest";
+
 const {
   parseCookies,
   createHashedPassword,
@@ -8,9 +11,9 @@ const jwt = require('jsonwebtoken');
 const User = require('../../models/User');
 const { PRIVATE_KEY } = require('../../libs/constant');
 
-const checkIsLogin = (req, res, next) => {
+export const checkIsLogin: RequestHandler = (req: UserRequest, res, _next) => {
   /** jwt쿠키 확인 */
-  const token = req.headers.authorization.split(' ')[1];
+  const token = req?.headers?.authorization?.split(' ')[1];
 
   if (token) {
     // toDo: 검증되지않은 토큰일때 에러처리
@@ -33,7 +36,7 @@ const checkIsLogin = (req, res, next) => {
   res.json({ ok: false });
 };
 
-const loginAndGetJWT = async (req, res, next) => {
+export const loginAndGetJWT: RequestHandler = async (req: UserRequest, res, next) => {
   try {
     const { id, password } = req.body;
 
@@ -54,12 +57,16 @@ const loginAndGetJWT = async (req, res, next) => {
     const token = jwt.sign({ id }, PRIVATE_KEY);
 
     res.json({ ok: true, token });
-  } catch (err) {
-    res.status(400).json({ ok: false, message: err.message });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ ok: false, message: error.message });
+    } else {
+      next(error);
+    }
   }
 };
 
-const loginWithSession = async (req, res, next) => {
+export const loginWithSession: RequestHandler = async (req: UserRequest, res, next) => {
   try {
     const { id, password } = req.body;
 
@@ -86,12 +93,16 @@ const loginWithSession = async (req, res, next) => {
 
     res.cookie('session', sessionId, sessionCookieOption);
     res.json({ ok: true, message: '로그인 세션' });
-  } catch (err) {
-    res.status(400).json({ ok: false, message: err.message });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).json({ ok: false, message: error.message });
+    } else {
+      next(error);
+    }
   }
 };
 
-const logout = (req, res, next) => {
+export const logout: RequestHandler = (req, res, _next) => {
   const cookieObj = parseCookies(req.headers.cookie);
   // 쿠키 삭제
   res.clearCookie('jwt');
@@ -104,7 +115,7 @@ const logout = (req, res, next) => {
   res.json({ ok: true, message: '로그아웃' });
 };
 
-const signUp = async (req, res, next) => {
+export const signUp: RequestHandler = async (req, res, next) => {
   try {
     const { id, password } = req.body;
 
@@ -128,14 +139,10 @@ const signUp = async (req, res, next) => {
   } catch (error) {
     console.error(error);
 
-    res.status(400).json({ ok: false, message: error.message });
+    if (error instanceof Error) {
+      res.status(400).json({ ok: false, message: error.message });
+    } else {
+      next(error);
+    }
   }
-};
-
-module.exports = {
-  checkIsLogin,
-  loginAndGetJWT,
-  loginWithSession,
-  logout,
-  signUp,
 };

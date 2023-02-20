@@ -1,7 +1,7 @@
-import './style.css';
-import Notepad from './src/pages/Notepad';
-import loginPage from './src/pages/LoginPage';
-import authApi from './src/api/auth.api';
+import '@/style.css';
+import Notepad from '@/pages/Notepad';
+import loginPage from '@/pages/LoginPage';
+import authApi from '@/api/auth.api';
 
 async function main() {
   const root = document.querySelector('#root');

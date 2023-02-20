@@ -1,6 +1,8 @@
+import { RequestHandler } from 'express';
+
 const { CLIENT_URL } = require('../../libs/constant');
 
-const setCorsHeader = (req, res, next) => {
+export const setCorsHeader: RequestHandler = (req, res, next) => {
   res.header(
     'Access-Control-Allow-Headers',
     'Authorization, Content-Type, Credentials'
@@ -10,7 +12,7 @@ const setCorsHeader = (req, res, next) => {
     'GET, OPTIONS, POST, PUT, DELETE, OPTIONS'
   );
   res.header('Access-Control-Allow-Origin', CLIENT_URL);
-  res.header('Access-Control-Allow-Credentials', true);
+  res.header('Access-Control-Allow-Credentials', 'true');
 
   if (req.method === 'OPTIONS') {
     return res.end();
@@ -18,5 +20,3 @@ const setCorsHeader = (req, res, next) => {
 
   return next();
 };
-
-module.exports = setCorsHeader;

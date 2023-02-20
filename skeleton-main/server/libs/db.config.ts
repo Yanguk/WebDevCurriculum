@@ -1,11 +1,11 @@
-const { Sequelize } = require('sequelize');
+import { Sequelize } from 'sequelize';
 
 const { DATA_BASE, USER_NAME, PASSWORD, PORT } = process.env;
 
-const sequelize = new Sequelize(DATA_BASE, USER_NAME, PASSWORD, {
+const sequelize = new Sequelize(DATA_BASE as string, USER_NAME as string, PASSWORD, {
   host: '127.0.0.1',
   dialect: 'mysql',
-  port: PORT,
+  port: Number(PORT),
   logging: false,
 });
 
