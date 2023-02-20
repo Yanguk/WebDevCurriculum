@@ -4,7 +4,7 @@ let id = 1;
 
 export const getId = () => id++;
 
-export const get = (id: number) => store.get(id);
+export const get = (id: string) => store.get(id);
 
 export const set = (value: string) => {
   const id = getId();

@@ -1,15 +1,11 @@
-import { RequestHandler } from "express";
-import UserRequest from "../../types/UserRequest";
+import { RequestHandler } from 'express';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
-const {
-  parseCookies,
-  createHashedPassword,
-  verifyPassword,
-} = require('../../libs');
-const session = require('../../libs/session');
-const jwt = require('jsonwebtoken');
-const User = require('../../models/User');
-const { PRIVATE_KEY } = require('../../libs/constant');
+import { parseCookies, createHashedPassword, verifyPassword } from '../../libs';
+import UserRequest from '../../types/UserRequest';
+import * as session from '../../libs/session';
+import User from '../../models/User';
+import { PRIVATE_KEY } from '../../libs/constant';
 
 export const checkIsLogin: RequestHandler = (req: UserRequest, res, _next) => {
   /** jwt쿠키 확인 */
@@ -17,13 +13,13 @@ export const checkIsLogin: RequestHandler = (req: UserRequest, res, _next) => {
 
   if (token) {
     // toDo: 검증되지않은 토큰일때 에러처리
-    const decoded = jwt.verify(token, PRIVATE_KEY);
+    const decoded = jwt.verify(token, PRIVATE_KEY) as JwtPayload;
 
     return res.json({ ok: true, id: decoded.id });
   }
 
   /** jwt가 없을때 세션 로그인 확인 */
-  const cookieObj = parseCookies(req.headers.cookie);
+  const cookieObj = parseCookies(req.headers.cookie as string);
 
   if (cookieObj['session']) {
     const sessionId = cookieObj['session'];
@@ -36,7 +32,11 @@ export const checkIsLogin: RequestHandler = (req: UserRequest, res, _next) => {
   res.json({ ok: false });
 };
 
-export const loginAndGetJWT: RequestHandler = async (req: UserRequest, res, next) => {
+export const loginAndGetJWT: RequestHandler = async (
+  req: UserRequest,
+  res,
+  next
+) => {
   try {
     const { id, password } = req.body;
 
@@ -66,7 +66,11 @@ export const loginAndGetJWT: RequestHandler = async (req: UserRequest, res, next
   }
 };
 
-export const loginWithSession: RequestHandler = async (req: UserRequest, res, next) => {
+export const loginWithSession: RequestHandler = async (
+  req: UserRequest,
+  res,
+  next
+) => {
   try {
     const { id, password } = req.body;
 
