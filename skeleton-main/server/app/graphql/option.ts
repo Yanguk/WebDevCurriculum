@@ -8,25 +8,30 @@ import Some from '../types/Option';
 
 const graphqlOption: ExpressMiddlewareOptions<BaseContext> = {
   context: async ({ req }) => {
-    const graphqlError = new GraphQLError('User is not authenticated', {
-      extensions: {
-        code: 'UNAUTHENTICATED',
-        http: { status: 401 },
-      },
-    });
-    // get the user token from the headers
-    const token = Some.wrapNull(
-      req?.headers?.authorization?.split(' ')[1]
-    ).expect(graphqlError);
+    try {
+      // todo: 추후 보완 필요
+      const graphqlError = new GraphQLError('User is not authenticated', {
+        extensions: {
+          code: 'UNAUTHENTICATED',
+          http: { status: 401 },
+        },
+      });
+      // get the user token from the headers
+      const token = Some.wrapNull(
+        req?.headers?.authorization?.split(' ')[1]
+      ).expect(graphqlError);
 
-    const decoded = jwt.verify(token, PRIVATE_KEY) as JwtPayload;
+      const decoded = jwt.verify(token, PRIVATE_KEY) as JwtPayload;
 
-    const user = Some.wrapNull(
-      await User.findOne({ where: { userId: decoded.id } })
-    ).expect(graphqlError);
+      const user = Some.wrapNull(
+        await User.findOne({ where: { userId: decoded.id } })
+      ).expect(graphqlError);
 
-    // add the user to the context
-    return { user };
+      // add the user to the context
+      return { user };
+    } catch (err) {
+      return { user: {} };
+    }
   },
 };
 

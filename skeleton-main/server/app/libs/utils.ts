@@ -23,6 +23,9 @@ export const parseCookies = pipe(
   }
 );
 
+export const range = (count: number): number[] =>
+  new Array(count).fill(0).map((_, idx) => idx);
+
 const promiseRandomBytes = promisify(randomBytes);
 const promisePbkdf2 = promisify(pbkdf2);
 
