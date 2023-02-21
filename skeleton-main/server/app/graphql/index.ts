@@ -37,7 +37,7 @@ const resolvers = {
       if (!contextValue.user) return null;
 
       console.log(contextValue.user);
-
+      // todo: 파일 저장하기
       return file.name + file.content;
     },
   },
