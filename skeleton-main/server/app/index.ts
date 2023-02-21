@@ -1,32 +1,37 @@
 import express from 'express';
-import { Application } from 'express';
-import http from 'node:http';
-import https from 'node:https';
-
-import { readFileSync } from 'node:fs';
-import { HTTPS_PORT, HTTP_PORT } from './libs/constant';
-
 import dotenv from 'dotenv';
 dotenv.config();
 
 import initApp from './loaders/app';
-import { connetDb } from './libs/db.config';
+import openHttpServer from './loaders/openHttpServer';
 
-const openHttpServer = async (app: Application) => {
-  await connetDb();
+import cluster from 'node:cluster';
+import process from 'node:process';
+import { cpus } from 'node:os';
 
-  http.createServer(app).listen(HTTP_PORT, () => {
-    console.log(`listening on port HTTP ${HTTP_PORT}`);
-  });
+console.log(cluster.isPrimary); // 처음에는 true, 두번째는 fals
 
-  const options = {
-    key: readFileSync('./localhost-key.pem'),
-    cert: readFileSync('./localhost.pem'),
-  };
+const numCPUs = cpus().length / 2;
 
-  https.createServer(options, app).listen(HTTPS_PORT, () => {
-    console.log(`listening on port HTTPS ${HTTPS_PORT}`);
-  });
-};
+async function main() {
+  if (cluster.isPrimary) {
+    console.log(`Primary ${process.pid} is running`);
 
-initApp(express()).then(openHttpServer);
+    // Fork workers.
+    for (let i = 0; i < numCPUs; i++) {
+      cluster.fork();
+    }
+
+    cluster.on('exit', (worker, _code, _signal) => {
+      console.log(`worker ${worker.process.pid} died`);
+    });
+  } else {
+    // Workers can share any TCP connection
+    // In this case it is an HTTP server
+    initApp(express()).then(openHttpServer);
+
+    console.log(`Worker ${process.pid} started`);
+  }
+}
+
+main();

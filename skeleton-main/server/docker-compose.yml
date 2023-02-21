@@ -1,0 +1,26 @@
+version: "3.9"
+services:
+  mysql:
+    container_name: "server-mysql"
+    restart: unless-stopped
+    hostname: "docker-mysql"
+    build:
+      context: ./mysql
+    ports:
+      - "3306:3306"
+  nodeserver:
+    container_name: "server-app"
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    build:
+      context: ./app
+    ports:
+      - "8001:8001"
+  nginx:
+    container_name: "server-nginx"
+    restart: always
+    build:
+      context: ./nginx
+    ports:
+      - "8000:80"
