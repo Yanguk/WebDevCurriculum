@@ -1,11 +1,15 @@
-import { RequestHandler } from "express";
+import { RequestHandler } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { PRIVATE_KEY } from "../../libs/constant";
-import UserRequest from "../../types/UserRequest";
+import { PRIVATE_KEY } from '../../libs/constant';
+import UserRequest from '../../types/UserRequest';
+import User from '../../models/User';
+import Some from '../../types/Option';
 
-const User = require('../../models/User');
-
-export const verifyToken: RequestHandler = async (req: UserRequest, res, next) => {
+export const verifyToken: RequestHandler = async (
+  req: UserRequest,
+  res,
+  next
+) => {
   try {
     const token = req?.headers?.authorization?.split(' ')[1];
 
@@ -15,8 +19,11 @@ export const verifyToken: RequestHandler = async (req: UserRequest, res, next) =
 
     const decoded = jwt.verify(token, PRIVATE_KEY) as JwtPayload;
 
-    const user = await User.findOne({ where: { userId: decoded.id } });
-    req.user = user.dataValues;
+    const user = Some.wrapNull(
+      await User.findOne({ where: { userId: decoded.id } })
+    ).unwrap();
+
+    req.user = user;
 
     next();
   } catch (err) {

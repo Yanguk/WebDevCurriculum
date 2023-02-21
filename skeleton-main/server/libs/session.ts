@@ -14,4 +14,4 @@ export const set = (value: string) => {
   return id;
 };
 
-export const remove = (id: number) => store.delete(id);
+export const remove = (id: string) => store.delete(id);

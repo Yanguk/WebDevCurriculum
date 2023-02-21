@@ -1,7 +1,11 @@
 import { RequestHandler } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 
-import { parseCookies, createHashedPassword, verifyPassword } from '../../libs';
+import {
+  parseCookies,
+  createHashedPassword,
+  verifyPassword,
+} from '../../libs/utils';
 import UserRequest from '../../types/UserRequest';
 import * as session from '../../libs/session';
 import User from '../../models/User';
@@ -19,17 +23,19 @@ export const checkIsLogin: RequestHandler = (req: UserRequest, res, _next) => {
   }
 
   /** jwt가 없을때 세션 로그인 확인 */
-  const cookieObj = parseCookies(req.headers.cookie as string);
+  if (req.headers.cookie) {
+    const cookieObj = parseCookies(req.headers.cookie);
 
-  if (cookieObj['session']) {
-    const sessionId = cookieObj['session'];
+    if (cookieObj['session']) {
+      const sessionId = cookieObj['session'];
 
-    const userId = session.get(sessionId);
+      const userId = session.get(sessionId);
 
-    return res.json({ ok: true, id: userId });
+      return res.json({ ok: true, id: userId });
+    }
   }
 
-  res.json({ ok: false });
+  res.status(400).json({ ok: false });
 };
 
 export const loginAndGetJWT: RequestHandler = async (
@@ -107,13 +113,13 @@ export const loginWithSession: RequestHandler = async (
 };
 
 export const logout: RequestHandler = (req, res, _next) => {
-  const cookieObj = parseCookies(req.headers.cookie);
+  const cookieObj = parseCookies(req.headers.cookie as string);
   // 쿠키 삭제
   res.clearCookie('jwt');
 
   // session에 있는 유저 정보 삭제 및 쿠키에 있는 세션 삭제;
   const sessionId = cookieObj['session'];
-  session.delete(sessionId);
+  session.remove(sessionId);
 
   res.clearCookie('session');
   res.json({ ok: true, message: '로그아웃' });
