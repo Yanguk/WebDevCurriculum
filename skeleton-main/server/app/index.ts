@@ -12,6 +12,8 @@ import { range } from './libs/utils';
 
 const numCPUs = cpus().length;
 
+console.log('cpu 갯수: ', numCPUs);
+
 async function main() {
   if (cluster.isPrimary) {
     console.log(`Primary ${process.pid} is running`);
