@@ -29,7 +29,11 @@ const resolvers = {
   },
   Mutation: {
     helloMu: () => 'test',
-    saveFile: (_: null, { file }: { file: { name: string; content: string } }, contextValue: any) => {
+    saveFile: (
+      _: null,
+      { file }: { file: { name: string; content: string } },
+      contextValue: any
+    ) => {
       if (!contextValue.user) return null;
 
       console.log(contextValue.user);
