@@ -14,7 +14,7 @@ const sequelize = new Sequelize(
   }
 );
 
-export const connectDb = async () => {
+export const migrationDb = async () => {
   try {
     await sequelize.sync();
     console.log('Connection has been established successfully.');

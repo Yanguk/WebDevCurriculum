@@ -6,7 +6,7 @@ import { setCorsHeader } from '../routes/middlewares/setCorsHeader';
 import fileRouter from '../routes/file.route';
 import authRouter from '../routes/auth.route';
 import apolloServer from '../graphql';
-import graphqlOption from '../graphql/option';
+import graphqlOption from '../graphql/middleware';
 import StatusError from '../types/Error';
 
 export default async function initApp(app: Application): Promise<Application> {

@@ -4,10 +4,10 @@ import https from 'node:https';
 
 import { readFileSync } from 'node:fs';
 import { HTTPS_PORT, HTTP_PORT } from '../libs/constant';
-import { connectDb } from '../libs/db.config';
+import { migrationDb } from '../libs/db.config';
 
 const openHttpServer = async (app: Application) => {
-  await connectDb();
+  await migrationDb();
 
   http.createServer(app).listen(HTTP_PORT, () => {
     console.log(`listening on port HTTP ${HTTP_PORT}`);

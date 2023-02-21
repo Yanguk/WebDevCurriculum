@@ -1,5 +1,4 @@
-import { CreationOptional, DataTypes, Model, Optional } from 'sequelize';
-import sequelize from '../libs/db.config';
+import { CreationOptional, DataTypes, Model, Optional, Sequelize } from 'sequelize';
 
 type UserAttributes = {
   id: number;
@@ -12,7 +11,7 @@ type UserAttributes = {
 
 type UserCreationAttributes = Optional<UserAttributes, keyof UserAttributes>;
 
-class User extends Model<UserAttributes, UserCreationAttributes> {
+export default class User extends Model<UserAttributes, UserCreationAttributes> {
   declare id: CreationOptional<number>;
   declare userId: string;
   declare password: string;
@@ -20,34 +19,34 @@ class User extends Model<UserAttributes, UserCreationAttributes> {
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
-}
 
-User.init(
-  {
-    id: {
-      type: DataTypes.INTEGER.UNSIGNED,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-    userId: {
-      type: new DataTypes.STRING(128),
-      allowNull: false,
-    },
-    password: {
-      type: new DataTypes.STRING(128),
-      allowNull: false,
-    },
-    salt: {
-      type: new DataTypes.STRING(128),
-      allowNull: false,
-    },
-    createdAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE,
-  },
-  {
-    tableName: 'users',
-    sequelize, // passing the `sequelize` instance is required
+  static initialize(sequelize: Sequelize) {
+    User.init(
+      {
+        id: {
+          type: DataTypes.INTEGER.UNSIGNED,
+          autoIncrement: true,
+          primaryKey: true,
+        },
+        userId: {
+          type: new DataTypes.STRING(128),
+          allowNull: false,
+        },
+        password: {
+          type: new DataTypes.STRING(128),
+          allowNull: false,
+        },
+        salt: {
+          type: new DataTypes.STRING(128),
+          allowNull: false,
+        },
+        createdAt: DataTypes.DATE,
+        updatedAt: DataTypes.DATE,
+      },
+      {
+        tableName: 'users',
+        sequelize, // passing the `sequelize` instance is required
+      }
+    );
   }
-);
-
-export default User;
+}
