@@ -1,26 +1,6 @@
 import { promisify } from 'util';
 import { pbkdf2, randomBytes } from 'node:crypto';
-import { ArityFunction, FirstParameters, LastReturnType } from '../types/Pipe';
-
-export const pipe =
-  <T extends ArityFunction[]>(
-    ...fs: T
-  ): ((..._args: FirstParameters<T>) => LastReturnType<T>) =>
-  (...args: FirstParameters<T>): LastReturnType<T> =>
-    fs.reduce((acc: unknown, f) => f(acc), args);
-
-export const parseCookies = pipe(
-  (str: string) => (str ? str.split(';') : []),
-  (arr: string[]) => arr.map((keyValue) => keyValue.trim().split('=')),
-  (list: string[][]) => {
-    const init: { [index: string]: string } = {};
-
-    return list.reduce(
-      (acc, cur: string[]) => ((acc[cur[0]] = cur[1]), acc),
-      init
-    );
-  }
-);
+import { ArityFunction, FirstParameters, LastReturnType } from '../types/utils';
 
 export const range = (count: number): number[] =>
   new Array(count).fill(0).map((_, idx) => idx);
@@ -52,6 +32,22 @@ export const verifyPassword = async (
   return hashedPassword === userPassword;
 };
 
+/**
+ * // pst1:
+ * reduce를 통한 간단한 함수 체이닝 인데 type을 지정하기가 까다로웠음
+ */
+export const pipe =
+  <T extends ArityFunction[]>(
+    ...fs: T
+  ): ((..._args: FirstParameters<T>) => LastReturnType<T>) =>
+  (...args: FirstParameters<T>): LastReturnType<T> =>
+    fs.reduce((acc: unknown, f) => f(acc), args);
+
+/**
+ * // pst1:
+ * 하고 싶었던 방식이었으나 타입설정하기 까다로워서 못하였음
+ * const go = (target, ...fs) => pipe(...fs)(target);
+ */
 export const go = <T extends ArityFunction[]>(
   target: FirstParameters<T>[0],
   ...fs: T
@@ -82,9 +78,7 @@ export const asyncGo = async <T extends ArityFunction[]>(
   return acc;
 };
 
-export function* intoIter<T extends { [key: string]: unknown }>(
-  obj: T
-) {
+export function* intoIter<T extends { [key: string]: unknown }>(obj: T) {
   for (const key in obj) {
     // eslint-disable-next-line no-prototype-builtins
     if (obj.hasOwnProperty(key)) {
@@ -92,3 +86,16 @@ export function* intoIter<T extends { [key: string]: unknown }>(
     }
   }
 }
+
+export const parseCookies = pipe(
+  (str: string) => (str ? str.split(';') : []),
+  (arr: string[]) => arr.map((keyValue) => keyValue.trim().split('=')),
+  (list: string[][]) => {
+    const init: { [index: string]: string } = {};
+
+    return list.reduce(
+      (acc, cur: string[]) => ((acc[cur[0]] = cur[1]), acc),
+      init
+    );
+  }
+);
