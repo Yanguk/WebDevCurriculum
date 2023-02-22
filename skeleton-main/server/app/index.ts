@@ -4,31 +4,24 @@ dotenv.config();
 
 import initApp from './loaders/app';
 import openHttpServer from './loaders/openHttpServer';
+import getSequelizeInstance from './libs/db.config';
+import connectDB from './loaders/dbConnect';
+import { Main } from './types/main';
+import { asyncGo } from './libs/utils';
 
-import cluster from 'node:cluster';
-import process from 'node:process';
-import { cpus } from 'node:os';
-import { range } from './libs/utils';
+const main: Main = async () => {
+  console.log('Start Server');
 
-const numCPUs = cpus().length;
+  asyncGo(
+    getSequelizeInstance(),
+    connectDB
+  );
 
-console.log('cpu 갯수: ', numCPUs);
-
-async function main() {
-  if (cluster.isPrimary) {
-    console.log(`Primary ${process.pid} is running`);
-
-    // Fork workers.
-    range(numCPUs).forEach(() => cluster.fork());
-
-    cluster.on('exit', (worker, _code, _signal) => {
-      console.log(`worker ${worker.process.pid} died`);
-    });
-  } else {
-    initApp(express()).then(openHttpServer);
-
-    console.log(`Worker ${process.pid} started`);
-  }
-}
+  asyncGo(
+    express(),
+    initApp,
+    openHttpServer
+  );
+};
 
 main();

@@ -9,6 +9,7 @@ export type FirstParameters<T extends ArityFunction[]> = T extends [
   ? Parameters<FIRST>
   : never;
 
+
 export type LastParameters<T extends ArityFunction[]> = T extends [
   ...infer REST,
   infer LAST extends (...args: any) => any

@@ -29,15 +29,15 @@ export default class User extends Model<UserAttributes, UserCreationAttributes> 
           primaryKey: true,
         },
         userId: {
-          type: new DataTypes.STRING(128),
+          type: new DataTypes.STRING(),
           allowNull: false,
         },
         password: {
-          type: new DataTypes.STRING(128),
+          type: new DataTypes.STRING(),
           allowNull: false,
         },
         salt: {
-          type: new DataTypes.STRING(128),
+          type: new DataTypes.STRING(),
           allowNull: false,
         },
         createdAt: DataTypes.DATE,

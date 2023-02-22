@@ -7,8 +7,7 @@ const pipe =
     ...fs: T
   ): ((..._args: FirstParameters<T>) => LastReturnType<T>) =>
   (...args: FirstParameters<T>): LastReturnType<T> =>
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    fs.reduce((acc: any, f: any) => f(acc), args);
+    fs.reduce((acc: unknown, f) => f(acc), args);
 
 export const parseCookies = pipe(
   (str: string) => (str ? str.split(';') : []),
@@ -52,3 +51,45 @@ export const verifyPassword = async (
 
   return hashedPassword === userPassword;
 };
+
+export const go = <T extends ArityFunction[]>(
+  target: FirstParameters<T>[0],
+  ...fs: T
+): LastReturnType<T> => {
+  const iter = fs[Symbol.iterator]();
+
+  let acc = iter.next().value(target);
+
+  for (const f of iter) {
+    acc = f(acc);
+  }
+
+  return acc;
+};
+
+export const asyncGo = async <T extends ArityFunction[]>(
+  target: FirstParameters<T>[0] | Promise<FirstParameters<T>[0]>,
+  ...fs: T
+): Promise<LastReturnType<T>> => {
+  const iter = fs[Symbol.iterator]();
+
+  let acc = await iter.next().value(target);
+
+  for (const f of iter) {
+    acc = await f(acc);
+  }
+
+  return acc;
+};
+
+export function* intoIter<T extends { [key: string]: unknown }>(
+  obj: T
+): Generator {
+  // ): Generator<unknown, any, [keyof T, typeof obj[keyof T]]> {
+  for (const key in obj) {
+    // eslint-disable-next-line no-prototype-builtins
+    if (obj.hasOwnProperty(key)) {
+      yield [key, obj[key]];
+    }
+  }
+}

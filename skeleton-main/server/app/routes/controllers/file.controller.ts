@@ -1,5 +1,6 @@
 import { RequestHandler } from 'express';
 import File from '../../models/File';
+import Some from '../../types/Option';
 import UserRequest from '../../types/UserRequest';
 
 export const getAll: RequestHandler = async (req: UserRequest, res, next) => {
@@ -19,8 +20,10 @@ export const addFile: RequestHandler = async (req: UserRequest, res, next) => {
     const { user, body } = req;
     const { name, content } = body;
 
+    const userId = Some.wrapNull(user?.dataValues.id).unwrap();
+
     const file = await File.create({
-      owner: user?.id,
+      owner: userId,
       name,
       content,
       activeTab: true,
