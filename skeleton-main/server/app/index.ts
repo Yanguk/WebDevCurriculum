@@ -6,10 +6,9 @@ import initApp from './loaders/app';
 import openHttpServer from './loaders/openHttpServer';
 import getSequelizeInstance from './libs/db.config';
 import connectDB from './loaders/dbConnect';
-import { Main } from './types/main';
 import { asyncGo } from './libs/utils';
 
-const main: Main = async () => {
+const main = async () => {
   dotenv.config();
 
   console.log('Start Server');

@@ -13,6 +13,7 @@ services:
     restart: unless-stopped
     depends_on:
       - mysql
+    command: sh -c "./wait-for-it.sh server-mysql:3306 -t 10 && npm start"
     build:
       context: ./app
     ports:
@@ -20,6 +21,8 @@ services:
   nginx:
     container_name: "server-nginx"
     restart: always
+    depends_on:
+      - app
     build:
       context: ./nginx
     ports:

@@ -9,9 +9,10 @@ ENV HOST=server-mysql
 WORKDIR /app
 
 COPY . /app
+COPY ./wait-for-it.sh ./wait-for-it.sh
 
 RUN npm install
 
-EXPOSE 8001
+RUN chmod +x wait-for-it.sh
 
-CMD ["npm", "start"]
+EXPOSE 8001

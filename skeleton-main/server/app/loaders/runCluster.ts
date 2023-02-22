@@ -1,9 +1,9 @@
-import cluster from "cluster";
-import { cpus } from "os";
-import { range } from "../libs/utils";
-import { Main } from "../types/main";
+import cluster from 'cluster';
+import { cpus } from 'os';
+import { range } from '../libs/utils';
+import { ArityFunction } from '../types/Pipe';
 
-export default async function runCluster(main: Main) {
+export default async function runCluster(main: ArityFunction) {
   if (cluster.isPrimary) {
     const numCPUs = cpus().length;
 
