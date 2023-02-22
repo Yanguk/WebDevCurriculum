@@ -2,7 +2,7 @@ import { promisify } from 'util';
 import { pbkdf2, randomBytes } from 'node:crypto';
 import { ArityFunction, FirstParameters, LastReturnType } from '../types/Pipe';
 
-const pipe =
+export const pipe =
   <T extends ArityFunction[]>(
     ...fs: T
   ): ((..._args: FirstParameters<T>) => LastReturnType<T>) =>
@@ -84,8 +84,7 @@ export const asyncGo = async <T extends ArityFunction[]>(
 
 export function* intoIter<T extends { [key: string]: unknown }>(
   obj: T
-): Generator {
-  // ): Generator<unknown, any, [keyof T, typeof obj[keyof T]]> {
+) {
   for (const key in obj) {
     // eslint-disable-next-line no-prototype-builtins
     if (obj.hasOwnProperty(key)) {

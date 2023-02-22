@@ -2,7 +2,6 @@ import cluster from "cluster";
 import { cpus } from "os";
 import { range } from "../libs/utils";
 import { Main } from "../types/main";
-import { ArityFunction } from "../types/Pipe";
 
 export default async function runCluster(main: Main) {
   if (cluster.isPrimary) {

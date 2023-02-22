@@ -19,6 +19,8 @@ const openHttpServer = async (app: Application) => {
   https.createServer(options, app).listen(HTTPS_PORT, () => {
     console.log(`listening on port HTTPS ${HTTPS_PORT}`);
   });
+
+  return app;
 };
 
 export default openHttpServer;
