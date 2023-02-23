@@ -1,9 +1,14 @@
 # 진행 사항 및 주석리스트
 
 ---
-## pst1 (presentation) 2/24
+## 2/24
+#### 1.  elasticSearch + grafana 로 서버의 로그 확인하기
+- 도커를 통하여 port 9200 에 elasticSearch 띄우고 nodejs랑 @elastic/elasticsearch 라이브러리로 연결
+- 도커로 grafana 실행시키고 databaseSource에 elasticSearch 추가
+- grafana 에서 판넬을 추가하고 lucence Query문으로 데이터 가져와서 시각화 가능
+  - lucene Query문도 낯설고 grafana 대시보드도 낯설어서 여기까지는 실습을 못하였음
 
-#### 1. docker 설정관련
+#### 2. docker 설정관련
 docker-compose 설정에있어서 mysql이 연결되고 node.js app이 켜져야 서버가 원활하게 켜지기때문에 도커 실행순서를 보장해주는 과정을 설정하느라 고생하였음.
 
 - docker-compose.yml 에서의 depends_on 옵션
@@ -17,7 +22,7 @@ docker-compose 설정에있어서 mysql이 연결되고 node.js app이 켜져야
     > [wait-for-it.sh](./server/app/wait-for-it.sh)
     > [app/Dockerfile](./server/app/Dockerfile)
 
-### 2. 테스트 코드를 작성하기 위한 모듈화 작업
+### 3. 테스트 코드를 작성하기 위한 모듈화 작업
 테스트를 원활하게 진행할려면 모듈화를 잘해야 합니다.
 
 그럴러면 모듈간의 의존성을 없애야 했고, 필요한 의존값들은 함수의 인자값으로 넘겨주는 형식으로 하여서 사이드 이펙트가 없는 순수한 함수로써 모듈을 작성하였습니다.
@@ -27,9 +32,6 @@ docker-compose 설정에있어서 mysql이 연결되고 node.js app이 켜져야
   - httpServer를 여는 부분도 모듈로 분리
     > [app/index.ts](./server/app/index.ts)
     > [app/libs/utils.ts](./server/app/libs/utils.ts)
-    > 과정에서 타입을 설정하는데 있어서 어려움을 겪음
-    > * 결국에 좋은 코드를 짤려면 타입추론도 하기 쉬운 코드를 짜야하는건지...
-    > * 제네릭 타입을 활용한 다형성있는 타입에 대해서는 정의하기가 아직은 힘든 과정임
 
 ---
 ## todo

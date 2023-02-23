@@ -33,7 +33,7 @@ export const verifyPassword = async (
 };
 
 /**
- * // pst1:
+ * // 2/24:
  * reduce를 통한 간단한 함수 체이닝 인데 type을 지정하기가 까다로웠음
  */
 export const pipe =
@@ -44,7 +44,7 @@ export const pipe =
     fs.reduce((acc: unknown, f) => f(acc), args);
 
 /**
- * // pst1:
+ * // 2/24:
  * 하고 싶었던 방식이었으나 타입설정하기 까다로워서 못하였음
  * const go = (target, ...fs) => pipe(...fs)(target);
  */

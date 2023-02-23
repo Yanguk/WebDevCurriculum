@@ -16,4 +16,20 @@ const getSequelizeInstance = (SequelizeClass: typeof Sequelize) => {
   );
 };
 
+export const getTestSequelizeInstance = (SequelizeClass: typeof Sequelize) => {
+  const { USER_NAME, PASSWORD, PORT, HOST } = process.env;
+
+  return new SequelizeClass(
+    'test',
+    USER_NAME as string,
+    PASSWORD as string,
+    {
+      host: HOST,
+      dialect: 'mysql',
+      port: Number(PORT),
+      logging: false,
+    }
+  );
+};
+
 export default getSequelizeInstance;

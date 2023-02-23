@@ -12,7 +12,7 @@ services:
     container_name: "server-app"
     restart: unless-stopped
     depends_on:
-      - mysql
+      - elasticsearch
     command: sh -c "./wait-for-it.sh server-mysql:3306 -t 10 && npm start"
     build:
       context: ./app
@@ -27,3 +27,19 @@ services:
       context: ./nginx
     ports:
       - "8000:80"
+  elasticsearch:
+    container_name: "server-elasticsearch"
+    build: ./elasticsearch
+    depends_on:
+      - mysql
+    volumes:
+      - ./elasticsearch/_data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+  grafana:
+    container_name: "server-grafana"
+    build: ./grafana
+    volumes:
+      - ./grafana/_data:/var/lib/grafana
+    ports:
+      - 3000:3000

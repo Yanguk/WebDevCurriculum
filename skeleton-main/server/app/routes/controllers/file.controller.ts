@@ -35,6 +35,27 @@ export const addFile: RequestHandler = async (req: UserRequest, res, next) => {
   }
 };
 
-export const deleteFile: RequestHandler = (req, res, next) => {
-  next();
+export const putFile: RequestHandler = async (req, res, next) => {
+  try {
+    const { body } = req;
+    const { fileId, name, content } = body;
+
+    await File.update({ name, content }, { where: { id: fileId } });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+export const deleteFile: RequestHandler = async (req: UserRequest, res, next) => {
+  try {
+    const { body } = req;
+    const { fileId } = body;
+
+    await File.destroy({ where: { id: fileId } });
+
+    res.json({ ok: true, message: 'delete File' });
+  } catch (err) {
+    next(err);
+  }
 };

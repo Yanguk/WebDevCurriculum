@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 
-const { CLIENT_URL } = require('../../libs/constant');
+import { CLIENT_URL } from '../../libs/constant';
 
 export const setCorsHeader: RequestHandler = (req, res, next) => {
   res.header(

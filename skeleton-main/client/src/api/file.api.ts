@@ -1,5 +1,5 @@
-import { getJwtToken } from '../libs';
-import { SERVER_URL } from '../libs/constants';
+import { getJwtToken } from '../lib';
+import { SERVER_URL } from '../lib/constants';
 
 const getAll = async () => {
   try {

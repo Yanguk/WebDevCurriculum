@@ -7,7 +7,7 @@ import Some from '../../types/Option';
 
 export const verifyToken: RequestHandler = async (
   req: UserRequest,
-  res,
+  _res,
   next
 ) => {
   try {

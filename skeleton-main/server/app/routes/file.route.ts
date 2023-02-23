@@ -9,6 +9,7 @@ router
   .route('/')
   .get(fileController.getAll)
   .post(fileController.addFile)
+  .put(fileController.putFile)
   .delete(fileController.deleteFile);
 
 export default router;

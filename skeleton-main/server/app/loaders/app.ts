@@ -8,6 +8,7 @@ import authRouter from '../routes/auth.route';
 import apolloServer from '../graphql';
 import graphqlOption from '../graphql/middleware';
 import StatusError from '../types/Error';
+import logger from './elasticsearch';
 
 export default async function initApp(app: Application): Promise<Application> {
   app.use(express.json());
@@ -33,7 +34,7 @@ export default async function initApp(app: Application): Promise<Application> {
   });
 
   app.use((err: StatusError, req: Request, res: Response) => {
-    console.error(err);
+    logger(err.message);
 
     const message = err.status || 'Internal Server Error';
     const status = err.status || 500;

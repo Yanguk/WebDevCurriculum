@@ -1,5 +1,5 @@
-import { parseCookies } from '../libs';
-import { SERVER_URL } from '../libs/constants';
+import { parseCookies } from '../lib';
+import { SERVER_URL } from '../lib/constants';
 
 const signup = async (body) => {
   try {

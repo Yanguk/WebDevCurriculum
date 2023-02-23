@@ -8,14 +8,14 @@ import Some from '../types/Option';
 
 const graphqlOption: ExpressMiddlewareOptions<BaseContext> = {
   context: async ({ req }) => {
+    const graphqlError = new GraphQLError('User is not authenticated', {
+      extensions: {
+        code: 'UNAUTHENTICATED',
+        http: { status: 401 },
+      },
+    });
+
     try {
-      // todo: 추후 보완 필요
-      const graphqlError = new GraphQLError('User is not authenticated', {
-        extensions: {
-          code: 'UNAUTHENTICATED',
-          http: { status: 401 },
-        },
-      });
       // get the user token from the headers
       const token = Some.wrapNull(
         req?.headers?.authorization?.split(' ')[1]
@@ -28,7 +28,7 @@ const graphqlOption: ExpressMiddlewareOptions<BaseContext> = {
       ).expect(graphqlError);
 
       // add the user to the context
-      return { user };
+      return { user: user.dataValues };
     } catch (err) {
       return { user: {} };
     }
