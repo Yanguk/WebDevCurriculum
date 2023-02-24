@@ -4,9 +4,10 @@ import express from 'express';
 import { Sequelize } from 'sequelize';
 
 import { getTestSequelizeInstance } from '../libs/db.config';
+import { File } from '../models';
+import Some from '../types/Option';
 import initApp from '../loaders/app';
 import connectDB from '../loaders/dbConnect';
-import { File } from '../models';
 
 dotenv.config();
 
@@ -104,11 +105,9 @@ describe('App E2E Test', () => {
     });
 
     it('PUT "/file"', async () => {
-      const fileData = await File.findOne({ where: { name: file1.name } });
-
-      if (!fileData) {
-        throw new Error('fail');
-      }
+      const fileData = Some.wrapNull(
+        await File.findOne({ where: { name: file1.name } }),
+      ).unwrap();
 
       const targetFile = fileData.dataValues;
 
@@ -126,13 +125,11 @@ describe('App E2E Test', () => {
 
       const { ok } = response.body;
 
-      const newFileData = await File.findOne({ where: { id: targetFile.id } });
+      const newFileData = Some.wrapNull(
+        await File.findOne({ where: { id: targetFile.id } }),
+      ).unwrap();
 
-      if (!newFileData) {
-        throw new Error('fail');
-      }
-
-      const newData = newFileData?.dataValues;
+      const newData = newFileData.dataValues;
 
       expect(ok).toBeTruthy();
       expect(newData.name).toBe(putInput.name);

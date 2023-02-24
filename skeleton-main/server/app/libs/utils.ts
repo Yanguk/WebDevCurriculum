@@ -24,7 +24,7 @@ export const createHashedPassword = async (password: string) => {
 export const verifyPassword = async (
   password: string,
   userSalt: string,
-  userPassword: string
+  userPassword: string,
 ) => {
   const hash = await promisePbkdf2(password, userSalt, 100000, 64, 'sha512');
   const hashedPassword = hash.toString('base64');
@@ -32,14 +32,8 @@ export const verifyPassword = async (
   return hashedPassword === userPassword;
 };
 
-/**
- * // 2/24:
- * reduce를 통한 간단한 함수 체이닝 인데 type을 지정하기가 까다로웠음
- */
 export const pipe =
-  <T extends ArityFunction[]>(
-    ...fs: T
-  ): ((..._args: FirstParameters<T>) => LastReturnType<T>) =>
+<T extends ArityFunction[]>(...fs: T) =>
   (...args: FirstParameters<T>): LastReturnType<T> =>
     fs.reduce((acc: unknown, f) => f(acc), args);
 
@@ -85,6 +79,11 @@ export function* intoIter<T extends { [key: string]: unknown }>(obj: T) {
 export const parseCookies = pipe(
   (str: string) => (str ? str.split(';') : []),
   (arr: string[]) => arr.map((keyValue) => keyValue.trim().split('=')),
-  (list: string[][]) => list.reduce((acc: { [index: string]: string }, cur: string[]) =>
-    ((acc[cur[0]] = cur[1]), acc), {})
+  (list: string[][]) =>
+    list.reduce(
+      (acc: { [index: string]: string }, cur: string[]) => (
+        (acc[cur[0]] = cur[1]), acc
+      ),
+      {},
+    ),
 );

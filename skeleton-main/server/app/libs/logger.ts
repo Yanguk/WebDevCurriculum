@@ -24,10 +24,10 @@ const getLogger = () => {
     client: esClient,
   });
 
-  //     await client.index({
-  //       index: 'logger',
-  //       document: {},
-  //     });
+      // await client.index({
+      //   index: 'logger',
+      //   document: {},
+      // });
 
   const logger = winston.createLogger({
     level: 'info',
