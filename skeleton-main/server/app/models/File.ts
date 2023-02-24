@@ -12,9 +12,6 @@ type FileAttributes = {
   name: string;
   content: string;
   activeTab: boolean;
-
-  createdAt: Date;
-  updatedAt: Date;
 };
 
 type FileCreationAttributes = Optional<FileAttributes, keyof FileAttributes>;
@@ -28,9 +25,6 @@ export default class File extends Model<
   declare name: string;
   declare content: string;
   declare activeTab: boolean;
-
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
 
   static initialize(sequelize: Sequelize) {
     File.init(
@@ -56,8 +50,6 @@ export default class File extends Model<
           type: DataTypes.BOOLEAN,
           defaultValue: false,
         },
-        createdAt: DataTypes.DATE,
-        updatedAt: DataTypes.DATE,
       },
       {
         tableName: 'files',

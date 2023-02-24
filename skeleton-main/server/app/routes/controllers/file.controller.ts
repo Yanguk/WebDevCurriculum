@@ -26,7 +26,7 @@ export const addFile: RequestHandler = async (req: UserRequest, res, next) => {
       owner: userId,
       name,
       content,
-      activeTab: true,
+      activeTab: false,
     });
 
     res.json({ ok: true, data: file });
@@ -41,11 +41,16 @@ export const putFile: RequestHandler = async (req, res, next) => {
     const { fileId, name, content } = body;
 
     await File.update({ name, content }, { where: { id: fileId } });
+
+    res.json({ ok: true, data: {
+      id: fileId,
+      name,
+      content,
+    } })
   } catch (err) {
     next(err);
   }
 };
-
 
 export const deleteFile: RequestHandler = async (req: UserRequest, res, next) => {
   try {

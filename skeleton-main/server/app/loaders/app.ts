@@ -1,6 +1,7 @@
 import { Application, NextFunction, Request, Response } from 'express';
 import { expressMiddleware } from '@apollo/server/express4';
 import express from 'express';
+import morgan from 'morgan';
 
 import { setCorsHeader } from '../routes/middlewares/setCorsHeader';
 import fileRouter from '../routes/file.route';
@@ -8,9 +9,9 @@ import authRouter from '../routes/auth.route';
 import apolloServer from '../graphql';
 import graphqlOption from '../graphql/middleware';
 import StatusError from '../types/Error';
-import logger from './elasticsearch';
 
 export default async function initApp(app: Application): Promise<Application> {
+  app.use(morgan('tiny'));
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(setCorsHeader);
@@ -34,7 +35,7 @@ export default async function initApp(app: Application): Promise<Application> {
   });
 
   app.use((err: StatusError, req: Request, res: Response) => {
-    logger(err.message);
+    console.error(err.message);
 
     const message = err.status || 'Internal Server Error';
     const status = err.status || 500;

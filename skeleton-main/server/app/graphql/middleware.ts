@@ -24,7 +24,7 @@ const graphqlOption: ExpressMiddlewareOptions<BaseContext> = {
       const decoded = jwt.verify(token, PRIVATE_KEY) as JwtPayload;
 
       const user = Some.wrapNull(
-        await User.findOne({ where: { userId: decoded.id } })
+        await User.findOne({ where: { id: decoded.id } })
       ).expect(graphqlError);
 
       // add the user to the context

@@ -1,4 +1,5 @@
 import { Sequelize } from 'sequelize';
+import logger from '../libs/logger';
 import { intoIter } from '../libs/utils';
 import * as models from '../models';
 
@@ -13,9 +14,11 @@ const eachModels = (fn: (_any: any) => void) => {
 const migrationDb = async (sequelize: Sequelize) => {
   try {
     await sequelize.sync();
-    console.log('Connection has been established successfully.');
+    logger.info('Connection has been established successfully.');
   } catch (error) {
-    console.error('Unable to connect to the database:', error);
+    logger.error('Unable to connect to the database:', error);
+
+    throw error;
   }
 };
 

@@ -19,7 +19,7 @@ export const checkIsLogin: RequestHandler = (req: UserRequest, res, _next) => {
     // toDo: 검증되지않은 토큰일때 에러처리
     const decoded = jwt.verify(token, PRIVATE_KEY) as JwtPayload;
 
-    return res.json({ ok: true, id: decoded.id });
+    return res.json({ ok: true, name: decoded.name });
   }
 
   /** jwt가 없을때 세션 로그인 확인 */
@@ -29,9 +29,9 @@ export const checkIsLogin: RequestHandler = (req: UserRequest, res, _next) => {
     if (cookieObj['session']) {
       const sessionId = cookieObj['session'];
 
-      const userId = session.get(sessionId);
+      const userName = session.get(sessionId);
 
-      return res.json({ ok: true, id: userId });
+      return res.json({ ok: true, name: userName });
     }
   }
 
@@ -41,13 +41,13 @@ export const checkIsLogin: RequestHandler = (req: UserRequest, res, _next) => {
 export const loginAndGetJWT: RequestHandler = async (
   req: UserRequest,
   res,
-  next
+  next,
 ) => {
   try {
-    const { id, password } = req.body;
+    const { name, password } = req.body;
 
     // 유저 검증...
-    const targetUser = await User.findOne({ where: { userId: id } });
+    const targetUser = await User.findOne({ where: { name } });
 
     if (!targetUser) {
       throw new Error('존재하는 않은 유저 Id');
@@ -60,7 +60,7 @@ export const loginAndGetJWT: RequestHandler = async (
     }
 
     // 토큰 발급...
-    const token = jwt.sign({ id }, PRIVATE_KEY);
+    const token = jwt.sign({ id: targetUser.dataValues.id, name }, PRIVATE_KEY);
 
     res.json({ ok: true, token });
   } catch (error) {
@@ -75,13 +75,13 @@ export const loginAndGetJWT: RequestHandler = async (
 export const loginWithSession: RequestHandler = async (
   req: UserRequest,
   res,
-  next
+  next,
 ) => {
   try {
-    const { id, password } = req.body;
+    const { name, password } = req.body;
 
     // 유저 검증...
-    const targetUser = await User.findOne({ where: { userId: id } });
+    const targetUser = await User.findOne({ where: { name } });
 
     if (!targetUser) {
       throw new Error('존재하는 않은 유저 Id');
@@ -94,7 +94,7 @@ export const loginWithSession: RequestHandler = async (
     // 주로 passport 의 인증 라이브러리와 express-session라이브러리를 사용하지만
     // 여기선 학습의도로 간단하게 추상화만 시켜서 진행하였음.
     // 존재하는 유저면 session Id를 쿠키에 넣어서 발급
-    const sessionId = session.set(id);
+    const sessionId = session.set(name);
 
     const sessionCookieOption = {
       httpOnly: true,
@@ -127,9 +127,9 @@ export const logout: RequestHandler = (req, res, _next) => {
 
 export const signUp: RequestHandler = async (req, res, next) => {
   try {
-    const { id, password } = req.body;
+    const { name, password } = req.body;
 
-    const isExistedId = !!(await User.findOne({ where: { userId: id } }));
+    const isExistedId = !!(await User.findOne({ where: { name } }));
 
     if (isExistedId) {
       throw new Error('존재하는 유저 Id');
@@ -140,12 +140,15 @@ export const signUp: RequestHandler = async (req, res, next) => {
 
     // 유저 등록하기
     const user = await User.create({
-      userId: id,
+      name,
       password: hashedPassword,
       salt,
     });
 
-    res.json({ ok: true, user: user.userId });
+    res.json({
+      ok: true,
+      user: { id: user.dataValues.id, name: user.dataValues.name },
+    });
   } catch (error) {
     console.error(error);
 

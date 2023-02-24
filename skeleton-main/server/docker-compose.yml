@@ -13,7 +13,7 @@ services:
     restart: unless-stopped
     depends_on:
       - elasticsearch
-    command: sh -c "./wait-for-it.sh server-mysql:3306 -t 10 && npm start"
+    command: sh -c "./wait-for-it.sh server-mysql:3306 -t 10 && npm test && npm start"
     build:
       context: ./app
     ports:

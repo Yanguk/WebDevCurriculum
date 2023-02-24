@@ -8,7 +8,7 @@
 * AWS ElasticSearch Service
 * Grafana
 
-## Resources
+## Resurces
 * [ElasticSearch](https://www.elastic.co/kr/what-is/elasticsearch)
 * [ElasticSearch 101](https://www.elastic.co/kr/webinars/getting-started-elasticsearch)
 * [Grafana Panels](https://grafana.com/docs/grafana/latest/panels/)
@@ -20,7 +20,7 @@
   >
   > #### 기존의 RDB와의 차이점
   > - 다양한 데이터 유형
-  >   - 구조환 데이터뿐만 아니라 비정형 데이터도 처리할 수 있습니다.
+  >   - 구조화된 데이터뿐만 아니라 비정형 데이터도 처리할 수 있습니다.
   >   - 비정형 데이터로는 로그 같은 데이터가 있는데 logstash, kibana, grafana 등을 같이 사용하여서 로그 데이터를 시각화/통계 분석을 할수 있습니다.
   > - 검색 중심
   >   - 데이터를 검색 및 분석하는데 최적화가 되있어서 빠른 검색 성능을 제공함
@@ -28,7 +28,9 @@
   >   - 동적 스키마를 지원하므로 데이터를 검색 및 저장할때 미리 정의된 스키마가 필요 없습니다.
   > - 분산 형 아키텍처
   >   - 데이터를 여러 노드로 분산하여 저장함
-
+  > <br>
+  >   > 클러스터, 노드, 마스터노드 인덱스, 타입, 도큐먼트, 샤드 & 리플리카
+  >
   > #### 장점
   > - 빠른검색
   > - 다양한 데이터 유형

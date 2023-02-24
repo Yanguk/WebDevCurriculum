@@ -43,11 +43,6 @@ export const pipe =
   (...args: FirstParameters<T>): LastReturnType<T> =>
     fs.reduce((acc: unknown, f) => f(acc), args);
 
-/**
- * // 2/24:
- * 하고 싶었던 방식이었으나 타입설정하기 까다로워서 못하였음
- * const go = (target, ...fs) => pipe(...fs)(target);
- */
 export const go = <T extends ArityFunction[]>(
   target: FirstParameters<T>[0],
   ...fs: T
@@ -90,12 +85,6 @@ export function* intoIter<T extends { [key: string]: unknown }>(obj: T) {
 export const parseCookies = pipe(
   (str: string) => (str ? str.split(';') : []),
   (arr: string[]) => arr.map((keyValue) => keyValue.trim().split('=')),
-  (list: string[][]) => {
-    const init: { [index: string]: string } = {};
-
-    return list.reduce(
-      (acc, cur: string[]) => ((acc[cur[0]] = cur[1]), acc),
-      init
-    );
-  }
+  (list: string[][]) => list.reduce((acc: { [index: string]: string }, cur: string[]) =>
+    ((acc[cur[0]] = cur[1]), acc), {})
 );

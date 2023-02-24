@@ -4,11 +4,12 @@ import { PRIVATE_KEY } from '../../libs/constant';
 import UserRequest from '../../types/UserRequest';
 import User from '../../models/User';
 import Some from '../../types/Option';
+import logger from '../../libs/logger';
 
 export const verifyToken: RequestHandler = async (
   req: UserRequest,
-  _res,
-  next
+  res,
+  next,
 ) => {
   try {
     const token = req?.headers?.authorization?.split(' ')[1];
@@ -20,13 +21,15 @@ export const verifyToken: RequestHandler = async (
     const decoded = jwt.verify(token, PRIVATE_KEY) as JwtPayload;
 
     const user = Some.wrapNull(
-      await User.findOne({ where: { userId: decoded.id } })
+      await User.findOne({ where: { id: decoded.id } }),
     ).unwrap();
 
     req.user = user;
 
     next();
   } catch (err) {
-    next(err);
+    logger.error(err);
+
+    res.status(403).json({ ok: false, message: 'forbidden' });
   }
 };

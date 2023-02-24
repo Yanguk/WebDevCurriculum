@@ -2,11 +2,9 @@ import { CreationOptional, DataTypes, Model, Optional, Sequelize } from 'sequeli
 
 type UserAttributes = {
   id: number;
-  userId: string;
+  name: string;
   password: string;
   salt: string;
-  createdAt: Date;
-  updatedAt: Date;
 };
 
 type UserCreationAttributes = Optional<UserAttributes, keyof UserAttributes>;
@@ -17,9 +15,6 @@ export default class User extends Model<UserAttributes, UserCreationAttributes> 
   declare password: string;
   declare salt: string;
 
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
-
   static initialize(sequelize: Sequelize) {
     User.init(
       {
@@ -28,7 +23,7 @@ export default class User extends Model<UserAttributes, UserCreationAttributes> 
           autoIncrement: true,
           primaryKey: true,
         },
-        userId: {
+        name: {
           type: new DataTypes.STRING(),
           allowNull: false,
         },
@@ -40,8 +35,6 @@ export default class User extends Model<UserAttributes, UserCreationAttributes> 
           type: new DataTypes.STRING(),
           allowNull: false,
         },
-        createdAt: DataTypes.DATE,
-        updatedAt: DataTypes.DATE,
       },
       {
         tableName: 'users',

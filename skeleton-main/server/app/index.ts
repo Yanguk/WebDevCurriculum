@@ -7,20 +7,20 @@ import openHttpServer from './loaders/openHttpServer';
 import getSequelizeInstance from './libs/db.config';
 import connectDB from './loaders/dbConnect';
 import { asyncGo } from './libs/utils';
-import logger from './loaders/elasticsearch';
+import logger from './libs/logger';
 
 const main = async () => {
   dotenv.config();
 
-  logger('Start Server');
+  logger.info('Start Server');
 
-  await asyncGo(
+  asyncGo(
     Sequelize,
     getSequelizeInstance,
     connectDB
   );
 
-  await asyncGo(
+  asyncGo(
     express(),
     initApp,
     openHttpServer,

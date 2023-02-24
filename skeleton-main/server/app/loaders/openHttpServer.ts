@@ -4,12 +4,12 @@ import https from 'node:https';
 
 import { readFileSync } from 'node:fs';
 import { HTTPS_PORT, HTTP_PORT } from '../libs/constant';
-import logger from './elasticsearch';
+import logger from '../libs/logger';
 
 const openHttpServer = async (app: Application) => {
 
   http.createServer(app).listen(HTTP_PORT, () => {
-    logger(`listening on port HTTP ${HTTP_PORT}`);
+    logger.info(`listening on port HTTP ${HTTP_PORT}`);
   });
 
   const options = {
@@ -18,7 +18,7 @@ const openHttpServer = async (app: Application) => {
   };
 
   https.createServer(options, app).listen(HTTPS_PORT, () => {
-    logger(`listening on port HTTPS ${HTTPS_PORT}`);
+    logger.info(`listening on port HTTPS ${HTTPS_PORT}`);
   });
 
   return app;
