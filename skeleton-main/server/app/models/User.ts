@@ -37,7 +37,7 @@ export default class User extends Model<UserAttributes, UserCreationAttributes> 
         },
       },
       {
-        tableName: 'users',
+        tableName: 'user',
         sequelize, // passing the `sequelize` instance is required
       }
     );

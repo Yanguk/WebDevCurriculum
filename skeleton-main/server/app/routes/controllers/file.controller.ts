@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import File from '../../models/File';
+import { User, File } from '../../models';
 import Some from '../../types/Option';
 import UserRequest from '../../types/UserRequest';
 
@@ -7,10 +7,19 @@ export const getAll: RequestHandler = async (req: UserRequest, res, next) => {
   try {
     const { user } = req;
 
-    const files = await File.findAll({ where: { owner: user?.id } });
+    const files = await File.findAll({
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'name'],
+        },
+      ],
+      where: { owner: user?.id },
+    });
 
-    res.json({ message: 'getAll', data: files });
+    res.json({ ok: true, data: files });
   } catch (err) {
+    console.log(err);
     next(err);
   }
 };
@@ -42,17 +51,24 @@ export const putFile: RequestHandler = async (req, res, next) => {
 
     await File.update({ name, content }, { where: { id: fileId } });
 
-    res.json({ ok: true, data: {
-      id: fileId,
-      name,
-      content,
-    } })
+    res.json({
+      ok: true,
+      data: {
+        id: fileId,
+        name,
+        content,
+      },
+    });
   } catch (err) {
     next(err);
   }
 };
 
-export const deleteFile: RequestHandler = async (req: UserRequest, res, next) => {
+export const deleteFile: RequestHandler = async (
+  req: UserRequest,
+  res,
+  next
+) => {
   try {
     const { body } = req;
     const { fileId } = body;

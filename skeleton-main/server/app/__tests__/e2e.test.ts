@@ -99,8 +99,8 @@ describe('App E2E Test', () => {
       const files = response.body.data;
       const targetFile = files[0];
 
-      // todo: id가 아니라 user를 join해서 가져오게 수정할 것
       expect(targetFile.owner).toBe(admin.id);
+      expect(targetFile['User'].name).toBe(admin.name);
       expect(targetFile.name).toBe(file1.name);
     });
 

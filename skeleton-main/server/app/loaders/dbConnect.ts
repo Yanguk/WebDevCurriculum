@@ -1,15 +1,6 @@
 import { Sequelize } from 'sequelize';
 import logger from '../libs/logger';
-import { intoIter } from '../libs/utils';
-import * as models from '../models';
-
-const eachModels = (fn: (_any: any) => void) => {
-  const iter = intoIter(models);
-
-  for (const model of iter) {
-    fn(model);
-  }
-};
+import { User, File } from '../models';
 
 const migrationDb = async (sequelize: Sequelize) => {
   try {
@@ -23,13 +14,12 @@ const migrationDb = async (sequelize: Sequelize) => {
 };
 
 const connectDB = async (sequelize: Sequelize) => {
-  const initModel = (model: {
-    initialize: (_sequelize: Sequelize) => void;
-  }) => {
-    model.initialize(sequelize);
-  };
+  const models = [User, File];
 
-  eachModels(([_key, value]) => initModel(value));
+  models.forEach((model) => model.initialize(sequelize));
+
+  User.hasMany(File, { foreignKey: 'id', sourceKey: 'id' });
+  File.belongsTo(User, { foreignKey: 'owner', targetKey: 'id' });
 
   await migrationDb(sequelize);
 };

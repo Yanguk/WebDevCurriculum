@@ -35,8 +35,12 @@ export default class File extends Model<
           primaryKey: true,
         },
         owner: {
-          type: new DataTypes.INTEGER(),
+          type: DataTypes.INTEGER.UNSIGNED,
           allowNull: false,
+          references: {
+            model: 'user',
+            key: 'id',
+          },
         },
         name: {
           type: new DataTypes.STRING(),

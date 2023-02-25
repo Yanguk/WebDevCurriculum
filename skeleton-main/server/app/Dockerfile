@@ -8,9 +8,7 @@ ENV HOST=server-mysql
 
 WORKDIR /app
 
-COPY ./wait-for-it.sh ./wait-for-it.sh
-
-COPY ./package.json /app
+COPY package.json /app
 
 RUN npm install
 

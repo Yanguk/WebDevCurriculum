@@ -13,7 +13,7 @@ services:
     restart: unless-stopped
     depends_on:
       - elasticsearch
-    command: sh -c "./wait-for-it.sh server-mysql:3306 -t 10 && npm test && npm start"
+    command: sh -c "/app/wait-for-it.sh server-mysql:3306 -t 10 && npm test && npm start"
     build:
       context: ./app
     ports:
@@ -32,14 +32,14 @@ services:
     build: ./elasticsearch
     depends_on:
       - mysql
-    volumes:
-      - ./elasticsearch/_data:/usr/share/elasticsearch/data
+    # volumes:
+    #   - ./elasticsearch/_data:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
   grafana:
     container_name: "server-grafana"
     build: ./grafana
-    volumes:
-      - ./grafana/_data:/var/lib/grafana
+    # volumes:
+    #   - ./grafana/_data:/var/lib/grafana
     ports:
       - 3000:3000
