@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 import { User, File } from '../../models';
-import Some from '../../types/Option';
+import Maybe from '../../types/Maybe';
 import UserRequest from '../../types/UserRequest';
 
 export const getAll: RequestHandler = async (req: UserRequest, res, next) => {
@@ -29,7 +29,7 @@ export const addFile: RequestHandler = async (req: UserRequest, res, next) => {
     const { user, body } = req;
     const { name, content } = body;
 
-    const userId = Some.wrapNull(user?.dataValues.id).unwrap();
+    const userId = Maybe.wrap(user?.dataValues.id).unwrap();
 
     const file = await File.create({
       owner: userId,

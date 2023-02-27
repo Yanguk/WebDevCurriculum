@@ -5,7 +5,7 @@ import { Sequelize } from 'sequelize';
 
 import { getTestSequelizeInstance } from '../libs/db.config';
 import { File } from '../models';
-import Some from '../types/Option';
+import Maybe from '../types/Maybe';
 import initApp from '../loaders/app';
 import connectDB from '../loaders/dbConnect';
 
@@ -105,8 +105,8 @@ describe('App E2E Test', () => {
     });
 
     it('PUT "/file"', async () => {
-      const fileData = Some.wrapNull(
-        await File.findOne({ where: { name: file1.name } }),
+      const fileData = Maybe.wrap(
+        await File.findOne({ where: { name: file1.name } })
       ).unwrap();
 
       const targetFile = fileData.dataValues;
@@ -125,8 +125,8 @@ describe('App E2E Test', () => {
 
       const { ok } = response.body;
 
-      const newFileData = Some.wrapNull(
-        await File.findOne({ where: { id: targetFile.id } }),
+      const newFileData = Maybe.wrap(
+        await File.findOne({ where: { id: targetFile.id } })
       ).unwrap();
 
       const newData = newFileData.dataValues;

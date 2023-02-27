@@ -4,7 +4,7 @@ import { GraphQLError } from 'graphql';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { PRIVATE_KEY } from '../libs/constant';
 import User from '../models/User';
-import Some from '../types/Option';
+import Some from '../types/Maybe';
 
 const graphqlOption: ExpressMiddlewareOptions<BaseContext> = {
   context: async ({ req }) => {
