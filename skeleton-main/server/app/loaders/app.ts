@@ -8,7 +8,7 @@ import fileRouter from '../routes/file.route';
 import authRouter from '../routes/auth.route';
 import apolloServer from '../graphql';
 import graphqlOption from '../graphql/middleware';
-import StatusError from '../types/Error';
+import { StatusError } from '../types/\bglobal';
 
 export default async function initApp(app: Application): Promise<Application> {
   if (process.env.NODE_ENV !== 'test') {

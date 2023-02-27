@@ -5,9 +5,9 @@ import { Sequelize } from 'sequelize';
 
 import { getTestSequelizeInstance } from '../libs/db.config';
 import { File } from '../models';
-import Maybe from '../types/Maybe';
 import initApp from '../loaders/app';
 import connectDB from '../loaders/dbConnect';
+import { Maybe } from 'uk-fp';
 
 dotenv.config();
 

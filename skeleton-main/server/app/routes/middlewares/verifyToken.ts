@@ -1,16 +1,12 @@
 import { RequestHandler } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
+import { Maybe } from 'uk-fp';
+
 import { PRIVATE_KEY } from '../../libs/constant';
-import UserRequest from '../../types/UserRequest';
 import User from '../../models/User';
-import Maybe from '../../types/Maybe';
 import logger from '../../libs/logger';
 
-export const verifyToken: RequestHandler = async (
-  req: UserRequest,
-  res,
-  next
-) => {
+export const verifyToken: RequestHandler = async (req, res, next) => {
   try {
     const token = req?.headers?.authorization?.split(' ')[1];
 

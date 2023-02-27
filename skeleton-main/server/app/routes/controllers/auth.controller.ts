@@ -6,12 +6,12 @@ import {
   createHashedPassword,
   verifyPassword,
 } from '../../libs/utils';
-import UserRequest from '../../types/UserRequest';
 import * as session from '../../libs/session';
 import User from '../../models/User';
 import { PRIVATE_KEY } from '../../libs/constant';
+import { Maybe } from 'uk-fp';
 
-export const checkIsLogin: RequestHandler = (req: UserRequest, res, _next) => {
+export const checkIsLogin: RequestHandler = (req, res, _next) => {
   /** jwt쿠키 확인 */
   const token = req?.headers?.authorization?.split(' ')[1];
 
@@ -39,7 +39,7 @@ export const checkIsLogin: RequestHandler = (req: UserRequest, res, _next) => {
 };
 
 export const loginAndGetJWT: RequestHandler = async (
-  req: UserRequest,
+  req,
   res,
   next,
 ) => {
@@ -73,7 +73,7 @@ export const loginAndGetJWT: RequestHandler = async (
 };
 
 export const loginWithSession: RequestHandler = async (
-  req: UserRequest,
+  req,
   res,
   next,
 ) => {
@@ -113,7 +113,7 @@ export const loginWithSession: RequestHandler = async (
 };
 
 export const logout: RequestHandler = (req, res, _next) => {
-  const cookieObj = parseCookies(req.headers.cookie as string);
+  const cookieObj = parseCookies(Maybe.wrap(req.headers.cookie).unwrap());
   // 쿠키 삭제
   res.clearCookie('jwt');
 

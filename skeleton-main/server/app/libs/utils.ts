@@ -1,6 +1,6 @@
 import { promisify } from 'util';
 import { pbkdf2, randomBytes } from 'node:crypto';
-import { ArityFunction, FirstParameters, LastReturnType } from '../types/utils';
+import { pipe } from 'uk-fp';
 
 export const range = (count: number): number[] =>
   new Array(count).fill(0).map((_, idx) => idx);
@@ -30,41 +30,6 @@ export const verifyPassword = async (
   const hashedPassword = hash.toString('base64');
 
   return hashedPassword === userPassword;
-};
-
-export const pipe =
-<T extends ArityFunction[]>(...fs: T) =>
-  (...args: FirstParameters<T>): LastReturnType<T> =>
-    fs.reduce((acc: unknown, f) => f(acc), args);
-
-export const go = <T extends ArityFunction[]>(
-  target: FirstParameters<T>[0],
-  ...fs: T
-): LastReturnType<T> => {
-  const iter = fs[Symbol.iterator]();
-
-  let acc = iter.next().value(target);
-
-  for (const f of iter) {
-    acc = f(acc);
-  }
-
-  return acc;
-};
-
-export const asyncGo = async <T extends ArityFunction[]>(
-  target: FirstParameters<T>[0] | Promise<FirstParameters<T>[0]>,
-  ...fs: T
-): Promise<LastReturnType<T>> => {
-  const iter = fs[Symbol.iterator]();
-
-  let acc = await iter.next().value(target);
-
-  for (const f of iter) {
-    acc = await f(acc);
-  }
-
-  return acc;
 };
 
 export function* intoIter<T extends { [key: string]: unknown }>(obj: T) {

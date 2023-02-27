@@ -1,4 +1,5 @@
 import { Sequelize } from 'sequelize';
+
 import express from 'express';
 import dotenv from 'dotenv';
 
@@ -6,7 +7,6 @@ import initApp from './loaders/app';
 import openHttpServer from './loaders/openHttpServer';
 import getSequelizeInstance from './libs/db.config';
 import connectDB from './loaders/dbConnect';
-import { asyncGo } from './libs/utils';
 import logger from './libs/logger';
 
 const main = async () => {
@@ -14,17 +14,13 @@ const main = async () => {
 
   logger.info('Start Server');
 
-  asyncGo(
-    Sequelize,
-    getSequelizeInstance,
-    connectDB
-  );
+  Promise.resolve(Sequelize)
+    .then(getSequelizeInstance)
+    .then(connectDB);
 
-  asyncGo(
-    express(),
-    initApp,
-    openHttpServer,
-  );
+  Promise.resolve(express())
+    .then(initApp)
+    .then(openHttpServer);
 };
 
 main();

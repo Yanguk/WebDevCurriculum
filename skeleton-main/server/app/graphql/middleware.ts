@@ -4,7 +4,7 @@ import { GraphQLError } from 'graphql';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { PRIVATE_KEY } from '../libs/constant';
 import User from '../models/User';
-import Some from '../types/Maybe';
+import { Maybe } from 'uk-fp';
 
 const graphqlOption: ExpressMiddlewareOptions<BaseContext> = {
   context: async ({ req }) => {
@@ -17,13 +17,13 @@ const graphqlOption: ExpressMiddlewareOptions<BaseContext> = {
 
     try {
       // get the user token from the headers
-      const token = Some.wrapNull(
+      const token = Maybe.wrap(
         req?.headers?.authorization?.split(' ')[1]
       ).expect(graphqlError);
 
       const decoded = jwt.verify(token, PRIVATE_KEY) as JwtPayload;
 
-      const user = Some.wrapNull(
+      const user = Maybe.wrap(
         await User.findOne({ where: { id: decoded.id } })
       ).expect(graphqlError);
 

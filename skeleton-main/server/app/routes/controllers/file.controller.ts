@@ -1,9 +1,8 @@
 import { RequestHandler } from 'express';
+import { Maybe } from 'uk-fp';
 import { User, File } from '../../models';
-import Maybe from '../../types/Maybe';
-import UserRequest from '../../types/UserRequest';
 
-export const getAll: RequestHandler = async (req: UserRequest, res, next) => {
+export const getAll: RequestHandler = async (req, res, next) => {
   try {
     const { user } = req;
 
@@ -24,7 +23,7 @@ export const getAll: RequestHandler = async (req: UserRequest, res, next) => {
   }
 };
 
-export const addFile: RequestHandler = async (req: UserRequest, res, next) => {
+export const addFile: RequestHandler = async (req, res, next) => {
   try {
     const { user, body } = req;
     const { name, content } = body;
@@ -64,11 +63,7 @@ export const putFile: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const deleteFile: RequestHandler = async (
-  req: UserRequest,
-  res,
-  next
-) => {
+export const deleteFile: RequestHandler = async (req, res, next) => {
   try {
     const { body } = req;
     const { fileId } = body;
