@@ -6,6 +6,7 @@ import { saveFile } from '@/common/viewModel';
 import { sha256 } from '../lib/pkg/rust_hash2';
 import { customDebounce } from '@/lib';
 import { debounce as lodashDebounce } from 'lodash';
+import SHA256 from '@/lib/jsHash';
 
 export default class Notepad {
   wrapperEl: Element;
@@ -62,26 +63,10 @@ export default class Notepad {
     const debounceEl = this.wrapperEl.querySelector('.debounce') as HTMLElement;
     const debounceText = this.wrapperEl.querySelector('.isDebounce') as HTMLElement;
 
-    const rustHashing = async (str: string) => {
-      console.log('rust');
+    const rustHashing = sha256;
 
-      return sha256(str);
-    };
 
-    const jsHashing = async (str: string) => {
-      console.log('js');
-      const utf8 = new TextEncoder().encode(str);
-
-      const hashBuffer = await window.crypto.subtle.digest('SHA-256', utf8);
-
-      const hash = go(
-        hashBuffer,
-        (buffer) => Array.from(new Uint8Array(buffer)),
-        (arr) => arr.map((bytes) => bytes.toString(16).padStart(2, '0')).join('')
-      );
-
-      return hash;
-    };
+    const jsHashing = SHA256
 
     buttonEl.addEventListener('click', () => {
       this.isRust = !this.isRust;
@@ -96,13 +81,13 @@ export default class Notepad {
       debounceText.textContent = String(this.isDebounce);
     })
 
-    const showHash = async () => {
+    const showHash = () => {
       const _startTime: number = performance.now();
 
       const content = this.getMainContent();
 
       const hashFn = this.isRust ? rustHashing : jsHashing;
-      const hashedText = await hashFn(content);
+      const hashedText = hashFn(content);
 
       const _endTime: number = performance.now();
 
