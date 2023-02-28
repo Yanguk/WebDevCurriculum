@@ -72,6 +72,7 @@ const loginCheck = async () => {
         Authorization: `Bearer ${token}`,
       },
     });
+
     const result = await response.json();
 
     return result;

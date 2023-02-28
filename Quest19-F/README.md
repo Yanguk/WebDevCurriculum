@@ -70,6 +70,33 @@
 - 텍스트 에디터 프로그램에서 각 탭의 내용의 SHA-256 해시를 실시간으로 계산하여 화면 아래에 표시해 보세요.
   - 해당 해시는 Rust로 작성된 웹 어셈블리 함수를 통해 계산되어야 합니다.
   - 순수 자바스크립트로 계산할 때와의 퍼포먼스 차이를 체크해 보세요. (퍼포먼스 차이를 알아보는 데에 어떤 전략들이 있을까요?)
+  > 1. Date() 함수로 측정
+  > - 밀리초(ms)단위로 측정 가능합니다.
+  > ```js
+  > const startTime: number = new Date().getTime();
+  > const endTime: number = new Date().getTime();
+  >
+  > console.log(`Result Time :  ${endTime - startTime} ms`);
+  > ```
+  > <br>
+  > 2. console.time() / console.timeEnd()
+  > - 밀리초(ms)단위 측정, 소수까지 표현됨
+  >
+  > ```js
+  > console.time("Performance Time")
+  > console.timeEnd("Performance Time")
+  > // Performance Time: 0.123123 ms
+  > ```
+  > <br>
+  > 3. performance.now()
+  > - 밀리초(ms)단위 측정, 소수까지 표현됨
+  >
+  > ```js
+  > const startTime: number = performance.now();
+  > const endTime: number = performance.now();
+  >
+  > console.log(`Result Time :  ${endTime - startTime} ms`);
+  > ```
 
 ## Advanced
 

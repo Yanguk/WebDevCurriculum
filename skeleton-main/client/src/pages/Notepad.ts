@@ -1,11 +1,15 @@
 import Store from '../common/store';
 import authApi from '../api/auth.api';
+import { go, Option } from 'uk-fp';
+import { sha256 } from '../lib/pkg/rust_hash2';
 
 export default class Notepad {
-  wrapperEl;
-  store;
+  wrapperEl: Element;
+  store: Store;
+  isRust: boolean;
 
   constructor(wrapperEl) {
+    this.isRust = false;
     this.store = new Store();
     this.wrapperEl = wrapperEl;
     this.template = `
@@ -23,6 +27,10 @@ export default class Notepad {
 <section class="main">
   <ul class="tab-wrapper"></ul>
   <div contenteditable=false class="content-area"></div>
+  <div>
+    <button class="hash-button">JS</button>
+    <p class="hash">hash</p>
+  </div>
 </section>
     `;
   }
@@ -34,6 +42,51 @@ export default class Notepad {
     this.#addNewFileButtonEvent();
     this.#addSaveButtonEvent();
     this.#addLogoutButtonEvent();
+
+    this.onChangeContextEvent();
+  }
+
+  private onChangeContextEvent() {
+    const hashBoxEl = this.wrapperEl.querySelector('.hash') as HTMLElement;
+    const contentEl = this.wrapperEl.querySelector('.content-area') as HTMLElement;
+    const buttonEl = Option.wrap(this.wrapperEl.querySelector('.hash-button')).unwrap();
+
+    const rustHashing = sha256;
+    const jsHashing = async (str: string) => {
+      const utf8 = new TextEncoder().encode(str);
+
+      const hashBuffer = await window.crypto.subtle.digest('SHA-256', utf8);
+
+      const hash = go(
+        hashBuffer,
+        (buffer) => Array.from(new Uint8Array(buffer)),
+        (arr) => arr.map((bytes) => bytes.toString(16).padStart(2, '0')).join('')
+      );
+
+      return hash;
+    };
+
+    buttonEl.addEventListener('click', () => {
+      this.isRust = !this.isRust;
+
+      contentEl.focus();
+
+      buttonEl.textContent = this.isRust ? 'Rust' : 'JS';
+    });
+
+    contentEl.addEventListener('input', async () => {
+      const _startTime: number = performance.now();
+
+      const content = Option.wrap(contentEl.textContent).unwrapOr('');
+
+      const hashFn = this.isRust ? rustHashing : jsHashing;
+
+      const hashedText = await hashFn(content);
+
+      const _endTime: number = performance.now();
+
+      hashBoxEl.innerHTML = `${hashedText} / <span class="performance">${_endTime - _startTime}<span> ms`;
+    });
   }
 
   #addLogoutButtonEvent() {
@@ -46,26 +99,22 @@ export default class Notepad {
   }
 
   #addSaveButtonEvent() {
-    this.wrapperEl
-      .querySelector('.save-button')
-      .addEventListener('click', (e) => {
-        e.preventDefault();
+    this.wrapperEl.querySelector('.save-button').addEventListener('click', (e) => {
+      e.preventDefault();
 
-        const selectFileEl = this.wrapperEl.querySelector('.selected');
+      const selectFileEl = this.wrapperEl.querySelector('.selected');
 
-        if (!selectFileEl) {
-          return;
-        }
+      if (!selectFileEl) {
+        return;
+      }
 
-        const targetId = selectFileEl.id;
+      const targetId = selectFileEl.id;
 
-        const targetFile = this.store
-          .getFiles()
-          .filter((file) => `file${file.id}` === targetId)[0];
+      const targetFile = this.store.getFiles().filter((file) => `file${file.id}` === targetId)[0];
 
-        targetFile.save(this.getMainContent());
-        this.save(targetFile);
-      });
+      targetFile.save(this.getMainContent());
+      this.save(targetFile);
+    });
   }
 
   #addNewFileButtonEvent() {
@@ -88,10 +137,7 @@ export default class Notepad {
       </li>
     `;
 
-    const fileListTemplate = files.reduce(
-      (acc, file) => acc + makeTemplate(file),
-      ''
-    );
+    const fileListTemplate = files.reduce((acc, file) => acc + makeTemplate(file), '');
 
     fileListEl.innerHTML = fileListTemplate;
 
@@ -102,9 +148,7 @@ export default class Notepad {
         e.preventDefault();
 
         const targetId = node.id;
-        const targetFile = this.store
-          .getFiles()
-          .filter((file) => `file${file.id}` === targetId)[0];
+        const targetFile = this.store.getFiles().filter((file) => `file${file.id}` === targetId)[0];
 
         targetFile.show(this);
         this.activeTab(targetFile);
@@ -156,9 +200,7 @@ export default class Notepad {
           return;
         }
 
-        const tabEl = this.store
-          .getTabs()
-          .filter((tab) => `file${tab.id}` === node.id)[0];
+        const tabEl = this.store.getTabs().filter((tab) => `file${tab.id}` === node.id)[0];
 
         this.activeTab(tabEl);
 

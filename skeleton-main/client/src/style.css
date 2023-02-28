@@ -76,10 +76,19 @@ ul, ol, li {
 }
 
 .editor-wrapper .main .content-area {
+  flex: 1;
   width: 100%;
-  height: calc(100% - 40px);
   padding: 10px;
   overflow-y: scroll;
+}
+
+.editor-wrapper .main .hash {
+  padding: 10px;
+  border-top: 1px solid black;
+}
+
+.performance {
+  color: green;
 }
 
 .login-container {

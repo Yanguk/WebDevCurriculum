@@ -71,7 +71,7 @@ function getInputValue() {
   const password = document.querySelector('#password').value;
 
   return {
-    id,
+    name: id,
     password,
   };
 }

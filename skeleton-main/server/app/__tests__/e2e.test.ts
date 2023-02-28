@@ -45,10 +45,7 @@ describe('App E2E Test', () => {
 
   describe('\nAuth Test', () => {
     it('POST "/auth/signup"', async () => {
-      const response = await server
-        .post('/auth/signup')
-        .send(admin)
-        .expect(200);
+      const response = await server.post('/auth/signup').send(admin).expect(200);
 
       const { ok, user } = response.body;
 
@@ -59,10 +56,7 @@ describe('App E2E Test', () => {
     });
 
     it('POST "/auth/login/jwt"', async () => {
-      const response = await server
-        .post('/auth/login/jwt')
-        .send(admin)
-        .expect(200);
+      const response = await server.post('/auth/login/jwt').send(admin).expect(200);
 
       expect(response.body.ok).toBeTruthy();
 
@@ -73,6 +67,11 @@ describe('App E2E Test', () => {
   describe('\nFile Test', () => {
     const file1 = {
       name: 'file1',
+      content: 'hello World',
+    };
+
+    const file2 = {
+      name: 'file2',
       content: 'hello World',
     };
 
@@ -88,13 +87,22 @@ describe('App E2E Test', () => {
       expect(result.ok).toBeTruthy();
       expect(result.data.name).toBe(file1.name);
       expect(result.data.content).toBe(file1.content);
+
+      const response2 = await server
+        .post('/file')
+        .set('Authorization', token)
+        .send(file2)
+        .expect(200);
+
+      const result2 = response2.body;
+
+      expect(result2.ok).toBeTruthy();
+      expect(result2.data.name).toBe(file2.name);
+      expect(result2.data.content).toBe(file2.content);
     });
 
     it('GET "/file"', async () => {
-      const response = await server
-        .get('/file')
-        .set('Authorization', token)
-        .expect(200);
+      const response = await server.get('/file').set('Authorization', token).expect(200);
 
       const files = response.body.data;
       const targetFile = files[0];
@@ -105,9 +113,7 @@ describe('App E2E Test', () => {
     });
 
     it('PUT "/file"', async () => {
-      const fileData = Maybe.wrap(
-        await File.findOne({ where: { name: file1.name } })
-      ).unwrap();
+      const fileData = Maybe.wrap(await File.findOne({ where: { name: file1.name } })).unwrap();
 
       const targetFile = fileData.dataValues;
 
@@ -125,9 +131,7 @@ describe('App E2E Test', () => {
 
       const { ok } = response.body;
 
-      const newFileData = Maybe.wrap(
-        await File.findOne({ where: { id: targetFile.id } })
-      ).unwrap();
+      const newFileData = Maybe.wrap(await File.findOne({ where: { id: targetFile.id } })).unwrap();
 
       const newData = newFileData.dataValues;
 

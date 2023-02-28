@@ -9,6 +9,7 @@ import authRouter from '../routes/auth.route';
 import apolloServer from '../graphql';
 import graphqlOption from '../graphql/middleware';
 import { StatusError } from '../types/\bglobal';
+import logger from '../libs/logger';
 
 export default async function initApp(app: Application): Promise<Application> {
   if (process.env.NODE_ENV !== 'test') {
@@ -38,7 +39,7 @@ export default async function initApp(app: Application): Promise<Application> {
   });
 
   app.use((err: StatusError, req: Request, res: Response) => {
-    console.error(err.message);
+    logger.error(err.message);
 
     const message = err.status || 'Internal Server Error';
     const status = err.status || 500;

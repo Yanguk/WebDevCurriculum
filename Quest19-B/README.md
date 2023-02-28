@@ -95,7 +95,7 @@
 
 - 메모장 시스템을 JWT 발급을 위한 마이크로서비스와 실제 비즈니스 로직을 처리하는 마이크로서비스로 나누어 보세요.
 - JWT 토큰 발급의 역할을 하는 마이크로서비스를 AWS Lambda와 API Gateway를 이용하여 구축해 보세요.
-
+  > GET https://sl3pq17pel.execute-api.ap-northeast-2.amazonaws.com/token?id=123&name=test
 ## Advanced
 
 - Istio는 어떤 툴일까요? 이 툴을 Kubernetes와 함께 사용하여 어떤 구조를 구현할 수 있을까요?

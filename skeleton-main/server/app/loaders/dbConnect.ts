@@ -18,7 +18,7 @@ const connectDB = async (sequelize: Sequelize) => {
 
   models.forEach((model) => model.initialize(sequelize));
 
-  User.hasMany(File, { foreignKey: 'id', sourceKey: 'id' });
+  User.hasMany(File, { foreignKey: 'owner', sourceKey: 'id' });
   File.belongsTo(User, { foreignKey: 'owner', targetKey: 'id' });
 
   await migrationDb(sequelize);

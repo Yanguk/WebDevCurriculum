@@ -25,11 +25,13 @@ export const getAll: RequestHandler = async (req, res, next) => {
 
 export const addFile: RequestHandler = async (req, res, next) => {
   try {
+    console.log('🌆 addFile');
     const { user, body } = req;
     const { name, content } = body;
 
     const userId = Maybe.wrap(user?.dataValues.id).unwrap();
-
+    console.log(userId);
+    console.log(body);
     const file = await File.create({
       owner: userId,
       name,
@@ -39,6 +41,9 @@ export const addFile: RequestHandler = async (req, res, next) => {
 
     res.json({ ok: true, data: file });
   } catch (err) {
+    const error = err as Error;
+    console.error(error.message);
+
     next(err);
   }
 };
