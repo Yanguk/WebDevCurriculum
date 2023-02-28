@@ -8,8 +8,8 @@ export default class File {
 
   show(notepad) {
     const contentArea = notepad.wrapperEl.querySelector('.content-area');
-
-    contentArea.textContent = this.content;
+    console.log(this.content);
+    contentArea.innerText = this.content;
     contentArea.setAttribute('contenteditable', true);
   }
 

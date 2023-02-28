@@ -1,5 +1,5 @@
-use wasm_bindgen::prelude::*;
 use sha2::{Digest, Sha256};
+use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
 pub fn sha256(content: String) -> String {

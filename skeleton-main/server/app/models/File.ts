@@ -47,7 +47,7 @@ export default class File extends Model<
           allowNull: false,
         },
         content: {
-          type: new DataTypes.STRING(),
+          type: new DataTypes.TEXT('long'),
           allowNull: false,
         },
         activeTab: {

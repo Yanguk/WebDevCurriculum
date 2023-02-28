@@ -1,14 +1,20 @@
 import Store from '../common/store';
 import authApi from '../api/auth.api';
 import { go, Option } from 'uk-fp';
+import { saveFile } from '@/common/viewModel';
+
 import { sha256 } from '../lib/pkg/rust_hash2';
+import { customDebounce } from '@/lib';
+import { debounce as lodashDebounce } from 'lodash';
 
 export default class Notepad {
   wrapperEl: Element;
   store: Store;
   isRust: boolean;
+  isDebounce: boolean;
 
   constructor(wrapperEl) {
+    this.isDebounce = false;
     this.isRust = false;
     this.store = new Store();
     this.wrapperEl = wrapperEl;
@@ -28,7 +34,10 @@ export default class Notepad {
   <ul class="tab-wrapper"></ul>
   <div contenteditable=false class="content-area"></div>
   <div>
-    <button class="hash-button">JS</button>
+    <div class="button-wrapper">
+      <button class="hash-button">JS</button>
+      <button class="debounce">isDebounce: <span class="isDebounce">${this.isDebounce}</span></button>
+    </div>
     <p class="hash">hash</p>
   </div>
 </section>
@@ -50,10 +59,17 @@ export default class Notepad {
     const hashBoxEl = this.wrapperEl.querySelector('.hash') as HTMLElement;
     const contentEl = this.wrapperEl.querySelector('.content-area') as HTMLElement;
     const buttonEl = Option.wrap(this.wrapperEl.querySelector('.hash-button')).unwrap();
+    const debounceEl = this.wrapperEl.querySelector('.debounce') as HTMLElement;
+    const debounceText = this.wrapperEl.querySelector('.isDebounce') as HTMLElement;
 
-    const rustHashing = sha256;
+    const rustHashing = async (str: string) => {
+      console.log('rust');
+
+      return sha256(str);
+    };
 
     const jsHashing = async (str: string) => {
+      console.log('js');
       const utf8 = new TextEncoder().encode(str);
 
       const hashBuffer = await window.crypto.subtle.digest('SHA-256', utf8);
@@ -75,23 +91,36 @@ export default class Notepad {
       buttonEl.textContent = this.isRust ? 'Rust' : 'JS';
     });
 
-    contentEl.addEventListener('input', async () => {
+    debounceEl.addEventListener('click', () => {
+      this.isDebounce = !this.isDebounce;
+      debounceText.textContent = String(this.isDebounce);
+    })
+
+    const showHash = async () => {
       const _startTime: number = performance.now();
 
-      const content = Option.wrap(contentEl.textContent).unwrapOr('');
+      const content = this.getMainContent();
 
       const hashFn = this.isRust ? rustHashing : jsHashing;
       const hashedText = await hashFn(content);
 
       const _endTime: number = performance.now();
+
       const performanceTime = (_endTime - _startTime).toFixed(2);
 
       hashBoxEl.innerHTML = `${hashedText} / <span class="performance">${performanceTime}<span> ms`;
+    };
+
+    const debounceShowHash = customDebounce(showHash, 500);
+
+    contentEl.addEventListener('input', () => {
+      this.isDebounce ? debounceShowHash() : showHash();
     });
   }
 
   #addLogoutButtonEvent() {
     const logoutButton = this.wrapperEl.querySelector('.logout-button');
+
     logoutButton.addEventListener('click', async (e) => {
       await authApi.logout();
 
@@ -100,22 +129,25 @@ export default class Notepad {
   }
 
   #addSaveButtonEvent() {
-    this.wrapperEl.querySelector('.save-button').addEventListener('click', (e) => {
-      e.preventDefault();
+    Option.wrap(this.wrapperEl.querySelector('.save-button'))
+      .unwrap()
+      .addEventListener('click', (e) => {
+        e.preventDefault();
 
-      const selectFileEl = this.wrapperEl.querySelector('.selected');
+        const selectFileEl = this.wrapperEl.querySelector('.selected');
 
-      if (!selectFileEl) {
-        return;
-      }
+        if (!selectFileEl) {
+          return;
+        }
 
-      const targetId = selectFileEl.id;
+        const targetId = selectFileEl.id;
+        console.log(this.store);
+        const targetFile = this.store.getFiles().filter((file) => `file${file.id}` === targetId)[0];
+        console.log(targetFile);
+        targetFile.save(this.getMainContent());
 
-      const targetFile = this.store.getFiles().filter((file) => `file${file.id}` === targetId)[0];
-
-      targetFile.save(this.getMainContent());
-      this.save(targetFile);
-    });
+        saveFile(targetFile);
+      });
   }
 
   #addNewFileButtonEvent() {
@@ -266,6 +298,9 @@ export default class Notepad {
   }
 
   getMainContent() {
-    return this.wrapperEl.querySelector('.content-area').textContent;
+    const target = this.wrapperEl.querySelector('.content-area') as HTMLElement;
+    const a = target.innerText.replaceAll('\n', '\\n');
+    return a;
+    // return this.wrapperEl.querySelector('.content-area').innerText;
   }
 }

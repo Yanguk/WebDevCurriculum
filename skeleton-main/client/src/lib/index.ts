@@ -1,12 +1,13 @@
-export const pipe =
-  (...fs) =>
-  (target) =>
-    fs.reduce((acc, f) => f(acc), target);
+import { pipe } from 'uk-fp';
 
 export const parseCookies = pipe(
-  (str) => (str ? str.split(';') : []),
+  (str: string) => (str ? str.split(';') : []),
   (arr) => arr.map((keyValue) => keyValue.trim().split('=')),
-  (list) => list.reduce((acc, cur) => ((acc[cur[0]] = cur[1]), acc), {})
+  (list) => {
+    const acc: { [name: string]: string } = {};
+
+    return list.reduce((acc, cur) => ((acc[cur[0]] = cur[1]), acc), acc);
+  }
 );
 
 export const getJwtToken = () => {
@@ -15,3 +16,13 @@ export const getJwtToken = () => {
 
   return token;
 };
+
+export const customDebounce = (f, time) => {
+  let timeout;
+
+  return () => {
+    clearInterval(timeout);
+
+    timeout = setTimeout(f, time)
+  }
+}
