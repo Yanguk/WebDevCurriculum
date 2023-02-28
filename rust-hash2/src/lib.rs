@@ -1,5 +1,4 @@
 use wasm_bindgen::prelude::*;
-use hex_literal::hex;
 use sha2::{Digest, Sha256};
 
 #[wasm_bindgen]
@@ -20,7 +19,6 @@ mod tests {
     #[test]
     fn it_works() {
         let result = sha256(String::from("hello world"));
-        println!("{:?}", result);
 
         assert_eq!(
             result,

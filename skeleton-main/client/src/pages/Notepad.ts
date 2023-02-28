@@ -52,6 +52,7 @@ export default class Notepad {
     const buttonEl = Option.wrap(this.wrapperEl.querySelector('.hash-button')).unwrap();
 
     const rustHashing = sha256;
+
     const jsHashing = async (str: string) => {
       const utf8 = new TextEncoder().encode(str);
 
@@ -80,12 +81,12 @@ export default class Notepad {
       const content = Option.wrap(contentEl.textContent).unwrapOr('');
 
       const hashFn = this.isRust ? rustHashing : jsHashing;
-
       const hashedText = await hashFn(content);
 
       const _endTime: number = performance.now();
+      const performanceTime = (_endTime - _startTime).toFixed(2);
 
-      hashBoxEl.innerHTML = `${hashedText} / <span class="performance">${_endTime - _startTime}<span> ms`;
+      hashBoxEl.innerHTML = `${hashedText} / <span class="performance">${performanceTime}<span> ms`;
     });
   }
 
