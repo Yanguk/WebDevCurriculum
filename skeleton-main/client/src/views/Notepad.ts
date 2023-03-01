@@ -3,6 +3,7 @@ import File, { FileInfo } from '@/models/File';
 import { vmFactory } from '@/lib/vmFactory';
 import { sha256 } from '@/lib/pkg/rust_hash2';
 import SHA256 from '@/lib/jsHash';
+import { customDebounce } from '@/lib';
 
 const VM = vmFactory();
 
@@ -83,7 +84,7 @@ function Notepad2() {
       contextArea.setAttribute('contenteditable', true);
     }
 
-    contextArea.textContent = targetFile?.content ?? '';
+    contextArea.innerText = targetFile?.content ?? '';
   });
 
   // 컨텐츠 영역 onChange
@@ -116,11 +117,13 @@ function Notepad2() {
 
     const debounceShowHash = customDebounce(showHash, 500);
 
-    if (targetFile.content) {
-      showHash();
+    const hashHandler = isDebounce ? debounceShowHash : showHash;
+
+    if (targetFile?.content) {
+      hashHandler();
     }
 
-    contentEl.addEventListener('input', showHash);
+    contentEl.addEventListener('input', hashHandler);
   });
 
   //saveButton Event
@@ -138,6 +141,15 @@ function Notepad2() {
     });
   });
 
+  VM.afterRender((selector) => {
+    const debounceButton = selector('debounce');
+
+    debounceButton.addEventListener('click', () => {
+      setIsDebounce(!isDebounce);
+    });
+  })
+
+  // focus 설정
   VM.afterRender((selector) => {
     const contentEl = selector('content-area') as HTMLElement;
     contentEl.focus();
@@ -189,9 +201,9 @@ function Notepad2() {
     <div>
       <div class="button-wrapper">
         <button class="hash-button">${isRust ? 'Rust' : 'JS'}</button>
-        <button class="debounce">isDebounce: <span class="isDebounce">${false}</span></button>
+        <button class="debounce">isDebounce: ${isDebounce}</button>
       </div>
-      <p class="hash"></p>
+      <p class="hash">hash</p>
     </div>
   </section>
 </div>

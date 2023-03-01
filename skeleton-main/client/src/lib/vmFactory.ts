@@ -88,13 +88,11 @@ export const vmFactory = () => {
   function useEffect(callback: () => void, depArray: any[]) {
     const oldDeps = Option.wrap(_states[_stateIdx]);
 
-    let hasChanged = true;
+    const hasChangedDeps = oldDeps.isSomeAnd((oldDeps) =>
+      depArray.some((dep, i) => !Object.is(dep, oldDeps[i]))
+    );
 
-    if (oldDeps.isSome()) {
-      hasChanged = oldDeps.isSomeAnd((oldDeps) =>
-        depArray.some((dep, i) => !Object.is(dep, oldDeps[i])),
-      );
-    }
+    const hasChanged = oldDeps.isSome() ? hasChangedDeps : true;
 
     if (hasChanged) {
       callback();
