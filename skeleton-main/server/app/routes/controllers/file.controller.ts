@@ -1,18 +1,19 @@
 import { RequestHandler } from 'express';
 import { Maybe } from 'uk-fp';
-import { User, File } from '../../models';
+import { File } from '../../models';
 
 export const getAll: RequestHandler = async (req, res, next) => {
   try {
     const { user } = req;
 
     const files = await File.findAll({
-      include: [
-        {
-          model: User,
-          attributes: ['id', 'name'],
-        },
-      ],
+      // include: [
+      //   {
+      //     model: User,
+      //     attributes: ['id', 'name'],
+      //   },
+      // ],
+      attributes: ['id', 'name', 'content', 'activeTab'],
       where: { owner: user?.id },
     });
 
@@ -25,13 +26,10 @@ export const getAll: RequestHandler = async (req, res, next) => {
 
 export const addFile: RequestHandler = async (req, res, next) => {
   try {
-    console.log('🌆 addFile');
     const { user, body } = req;
     const { name, content } = body;
 
     const userId = Maybe.wrap(user?.dataValues.id).unwrap();
-    console.log(userId);
-    console.log(body);
     const file = await File.create({
       owner: userId,
       name,

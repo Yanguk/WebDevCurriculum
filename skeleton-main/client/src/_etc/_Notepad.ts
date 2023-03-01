@@ -1,7 +1,7 @@
-import Store from '../common/store';
+import Store from '../models/store';
 import authApi from '../api/auth.api';
 import { go, Option } from 'uk-fp';
-import { saveFile } from '@/common/viewModel';
+import { saveFile } from '@/models/viewModel';
 
 import { sha256 } from '../lib/pkg/rust_hash2';
 import { customDebounce } from '@/lib';

@@ -25,7 +25,7 @@ ul, ol, li {
 }
 
 .explorer {
-  width: 200px;
+  min-width: 170px;
   background-color: #999;
 }
 
