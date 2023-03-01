@@ -1,4 +1,3 @@
-import { File } from '@/types';
 import { getJwtToken } from '../lib';
 import { SERVER_URL } from '../lib/constants';
 
@@ -29,7 +28,7 @@ const getAll = async () => {
 
 const postFile = async (file: File) => {
   const token = getJwtToken();
-  console.log(token);
+
   const response = await fetch(`${SERVER_URL}/file`, {
     method: 'post',
     headers: {
@@ -43,6 +42,25 @@ const postFile = async (file: File) => {
 
   const result = await response.json();
   console.log(result);
+  return result.data;
+};
+
+const putFile = async (file) => {
+  const token = getJwtToken();
+
+  const response = await fetch(`${SERVER_URL}/file`, {
+    method: 'put',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    credentials: 'include',
+    body: JSON.stringify(file),
+  });
+
+  const result = await response.json();
+
   return result.data;
 };
 
@@ -69,4 +87,5 @@ export default {
   getAll,
   postFile,
   deleteFile,
+  putFile,
 };

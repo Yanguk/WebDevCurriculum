@@ -1,10 +1,10 @@
 import fileApi from '@/api/file.api';
 import File, { FileInfo } from '@/models/File';
-import { viewModelFactory } from '@/lib/viewModelFactory';
+import { vmFactory } from '@/lib/vmFactory';
 import { sha256 } from '@/lib/pkg/rust_hash2';
 import SHA256 from '@/lib/jsHash';
 
-const VM = viewModelFactory();
+const VM = vmFactory();
 
 const controller = (() => {
   const getTimePerformance = (f) => {
@@ -14,13 +14,32 @@ const controller = (() => {
 
     const _endTime: number = performance.now();
 
-    const performanceTime = (_endTime - _startTime).toFixed(2);
+    const performanceTime = (_endTime - _startTime).toFixed(3);
 
     return [result, performanceTime];
   };
 
+  const getAll = async () => {
+    const { data } = await fileApi.getAll();
+
+    return data;
+  };
+
+  const saveFile = async (file: File) => {
+    const result = await fileApi.putFile(file);
+    console.log(result);
+  };
+
+  const addFile = async (file: File) => {
+    const result = await fileApi.postFile(file);
+    console.log(result);
+  };
+
   return {
     getTimePerformance,
+    getAll,
+    saveFile,
+    addFile,
   };
 })();
 
@@ -28,14 +47,16 @@ function Notepad2() {
   const [files, setFiles] = VM.useState([]);
   const [curFileId, setCurFileId] = VM.useState(0);
   const [isRust, setIsRust] = VM.useState(false);
+  const [isDebounce, setIsDebounce] = VM.useState(false);
 
   VM.useEffect(async () => {
-    console.log(123);
-    const { data } = await fileApi.getAll();
-    const newFiles = data.map((file: FileInfo) => new File(file));
+    const files = await controller.getAll();
+    const newFiles = files.map((file: FileInfo) => new File(file));
+
     setFiles(newFiles);
   }, []);
 
+  // 파일리스트 클릭시 활성화
   VM.afterRender((selector) => {
     const fileNodes: NodeList = selector('file', { all: true });
 
@@ -53,6 +74,7 @@ function Notepad2() {
     });
   });
 
+  // 컨텐츠 영역 활성화
   VM.afterRender((selector) => {
     const contextArea = selector('content-area');
     const targetFile = files.find((file: File) => file.id === curFileId);
@@ -64,12 +86,14 @@ function Notepad2() {
     contextArea.textContent = targetFile?.content ?? '';
   });
 
+  // 컨텐츠 영역 onChange
   VM.afterRender((selector) => {
     const hashBoxEl = selector('hash') as HTMLElement;
     const contentEl = selector('content-area') as HTMLElement;
     const buttonEl = selector('hash-button') as HTMLElement;
     // const debounceEl = selector('.debounce') as HTMLElement;
     // const debounceText = selector('.isDebounce') as HTMLElement;
+    const targetFile = files.find((file: File) => file.id === curFileId);
 
     const rustHashing = sha256;
     const jsHashing = SHA256;
@@ -83,12 +107,40 @@ function Notepad2() {
       const content = contentEl.innerText;
       const [hashedText, performanceTime] = controller.getTimePerformance(() => hashFn(content));
 
+      if (targetFile) {
+        targetFile.content = contentEl.innerText;
+      }
+
       hashBoxEl.innerHTML = `${hashedText} / <span class="performance">${performanceTime}<span> ms`;
     };
 
-    // const debounceShowHash = customDebounce(showHash, 500);
+    const debounceShowHash = customDebounce(showHash, 500);
+
+    if (targetFile.content) {
+      showHash();
+    }
 
     contentEl.addEventListener('input', showHash);
+  });
+
+  //saveButton Event
+  VM.afterRender((selector) => {
+    const saveButton = selector('save-button') as HTMLElement;
+    const contentEl = selector('content-area') as HTMLElement;
+    const targetFile = files.find((file: File) => file.id === curFileId);
+
+    saveButton.addEventListener('click', async (e) => {
+      if (targetFile) {
+        console.log(targetFile);
+        await controller.saveFile(targetFile);
+        console.log(123);
+      }
+    });
+  });
+
+  VM.afterRender((selector) => {
+    const contentEl = selector('content-area') as HTMLElement;
+    contentEl.focus();
   });
 
   const fileTemplate = files
@@ -139,7 +191,7 @@ function Notepad2() {
         <button class="hash-button">${isRust ? 'Rust' : 'JS'}</button>
         <button class="debounce">isDebounce: <span class="isDebounce">${false}</span></button>
       </div>
-      <p class="hash">hash</p>
+      <p class="hash"></p>
     </div>
   </section>
 </div>

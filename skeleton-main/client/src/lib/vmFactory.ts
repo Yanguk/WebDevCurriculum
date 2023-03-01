@@ -2,7 +2,7 @@
 import { Option } from 'uk-fp';
 import { customDebounce } from '.';
 
-export const viewModelFactory = () => {
+export const vmFactory = () => {
   const _states: any[] = [];
   let _stateIdx = 0;
   let root: Option<Element> = Option.wrap(null);
@@ -48,7 +48,7 @@ export const viewModelFactory = () => {
       _states[curIdx] = newState;
 
       _render();
-      console.log(_states);
+
     };
 
     _stateIdx++;

@@ -7,7 +7,7 @@ export const parseCookies = pipe(
     const acc: { [name: string]: string } = {};
 
     return list.reduce((acc, cur) => ((acc[cur[0]] = cur[1]), acc), acc);
-  }
+  },
 );
 
 export const getJwtToken = () => {
@@ -17,12 +17,12 @@ export const getJwtToken = () => {
   return token;
 };
 
-export const customDebounce = (f, time) => {
-  let timeout;
+export const customDebounce = <T extends () => void>(f: T, time: number) => {
+  let timeout: number;
 
   return () => {
     clearInterval(timeout);
 
-    timeout = setTimeout(f, time)
-  }
-}
+    timeout = setTimeout(f, time);
+  };
+};

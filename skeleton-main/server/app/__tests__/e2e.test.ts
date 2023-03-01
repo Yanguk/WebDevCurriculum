@@ -106,7 +106,7 @@ describe('App E2E Test', () => {
 
       const files = response.body.data;
       const targetFile = files[0];
-
+      
       expect(targetFile.owner).toBe(admin.id);
       expect(targetFile['User'].name).toBe(admin.name);
       expect(targetFile.name).toBe(file1.name);
@@ -118,7 +118,7 @@ describe('App E2E Test', () => {
       const targetFile = fileData.dataValues;
 
       const putInput = {
-        fileId: targetFile.id,
+        id: targetFile.id,
         name: 'newName',
         content: 'newContent',
       };

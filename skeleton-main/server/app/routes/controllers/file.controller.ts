@@ -1,19 +1,19 @@
 import { RequestHandler } from 'express';
 import { Maybe } from 'uk-fp';
-import { File } from '../../models';
+import { File, User } from '../../models';
 
 export const getAll: RequestHandler = async (req, res, next) => {
   try {
     const { user } = req;
 
     const files = await File.findAll({
-      // include: [
-      //   {
-      //     model: User,
-      //     attributes: ['id', 'name'],
-      //   },
-      // ],
-      attributes: ['id', 'name', 'content', 'activeTab'],
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'name'],
+        },
+      ],
+      attributes: ['id', 'name', 'content', 'activeTab', 'owner'],
       where: { owner: user?.id },
     });
 
@@ -49,14 +49,14 @@ export const addFile: RequestHandler = async (req, res, next) => {
 export const putFile: RequestHandler = async (req, res, next) => {
   try {
     const { body } = req;
-    const { fileId, name, content } = body;
+    const { id, name, content } = body;
 
-    await File.update({ name, content }, { where: { id: fileId } });
+    await File.update({ name, content }, { where: { id } });
 
     res.json({
       ok: true,
       data: {
-        id: fileId,
+        id,
         name,
         content,
       },
