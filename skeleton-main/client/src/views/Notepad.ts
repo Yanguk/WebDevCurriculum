@@ -8,7 +8,7 @@ import { customDebounce } from '@/lib';
 const VM = vmFactory();
 
 const controller = (() => {
-  const getTimePerformance = (f) => {
+  const getTimePerformance = <T extends (...a: any[]) => any>(f: T) => {
     const _startTime: number = performance.now();
 
     const result = f();
@@ -45,7 +45,7 @@ const controller = (() => {
 })();
 
 function Notepad2() {
-  const [files, setFiles] = VM.useState([]);
+  const [files, setFiles] = VM.useState<File[]>([]);
   const [curFileId, setCurFileId] = VM.useState(0);
   const [isRust, setIsRust] = VM.useState(false);
   const [isDebounce, setIsDebounce] = VM.useState(false);
@@ -66,7 +66,7 @@ function Notepad2() {
         const targetId = Number(node.id);
 
         const newFiles = files.map((file: File) =>
-          file.id === targetId ? new File({ ...file, activeTab: true }) : file,
+          file.id === targetId ? new File({ ...file, activeTab: true }) : file
         );
 
         setCurFileId(targetId);
@@ -92,8 +92,6 @@ function Notepad2() {
     const hashBoxEl = selector('hash') as HTMLElement;
     const contentEl = selector('content-area') as HTMLElement;
     const buttonEl = selector('hash-button') as HTMLElement;
-    // const debounceEl = selector('.debounce') as HTMLElement;
-    // const debounceText = selector('.isDebounce') as HTMLElement;
     const targetFile = files.find((file: File) => file.id === curFileId);
 
     const rustHashing = sha256;
@@ -129,25 +127,23 @@ function Notepad2() {
   //saveButton Event
   VM.afterRender((selector) => {
     const saveButton = selector('save-button') as HTMLElement;
-    const contentEl = selector('content-area') as HTMLElement;
     const targetFile = files.find((file: File) => file.id === curFileId);
 
-    saveButton.addEventListener('click', async (e) => {
+    saveButton.addEventListener('click', async () => {
       if (targetFile) {
-        console.log(targetFile);
         await controller.saveFile(targetFile);
-        console.log(123);
       }
     });
   });
 
+  // debounce 버튼 이벤트
   VM.afterRender((selector) => {
     const debounceButton = selector('debounce');
 
     debounceButton.addEventListener('click', () => {
       setIsDebounce(!isDebounce);
     });
-  })
+  });
 
   // focus 설정
   VM.afterRender((selector) => {
@@ -162,7 +158,7 @@ function Notepad2() {
       <p>${file.name}</p>
       <button class="delete">X</button>
     </li>
-  `,
+  `
     )
     .join('');
 
@@ -174,7 +170,7 @@ function Notepad2() {
         <p class="name">${file.name}</p>
         <button class="closeTab">X</button>
       </li>
-    `,
+    `
     )
     .join('');
 
