@@ -64,7 +64,7 @@ const putFile = async (file) => {
   return result.data;
 };
 
-const deleteFile = async (name) => {
+const deleteFile = async (id) => {
   const token = getJwtToken();
 
   const response = await fetch(`${SERVER_URL}/file`, {
@@ -75,7 +75,7 @@ const deleteFile = async (name) => {
       Authorization: `Bearer ${token}`,
     },
     credentials: 'include',
-    body: JSON.stringify({ name }),
+    body: JSON.stringify({ id }),
   });
 
   const data = await response.json();

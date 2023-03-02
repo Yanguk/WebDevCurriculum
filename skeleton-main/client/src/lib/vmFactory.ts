@@ -41,14 +41,13 @@ export const vmFactory = () => {
   }
 
   function useState<T>(initialState: T): [T, typeof setState] {
-    const state = _states[_stateIdx] || initialState;
+    const state = _states[_stateIdx] ?? initialState;
     const curIdx = _stateIdx;
 
     const setState = (newState: any): void => {
       _states[curIdx] = newState;
 
       _render();
-
     };
 
     _stateIdx++;

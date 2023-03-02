@@ -41,16 +41,36 @@ const controller = (() => {
 
   const getTabs = () => {
     // todo: 로컬스토리지에서 꺼내오기
-    const tabs = window.localStorage.getItem('tabs');
+    const tabs = window.sessionStorage.getItem('tabs');
 
     return JSON.parse(tabs) || [];
   };
 
   const saveTabs = <T extends []>(tabs: T) => {
-    window.localStorage.setItem('tabs', JSON.stringify(tabs));
+    window.sessionStorage.setItem('tabs', JSON.stringify(tabs));
 
     return true;
   };
+
+  const getCurFileId = () => {
+    return Number(window.sessionStorage.getItem('file')) || 0;
+  };
+
+  const saveCurFileId = (id) => {
+    window.sessionStorage.setItem('file', `${id}`);
+
+    return;
+  };
+
+  const deleteFile = async (id: number) => {
+    const result = await fileApi.deleteFile(id);
+    return result;
+  };
+
+  const checkFileName = (name: string) => {
+    const reges = /^[a-zA-Z0-9가-힣_-]+\.[a-zA-Z0-9]+$/;
+    return reges.test(name);
+  }
 
   return {
     getTimePerformance,
@@ -59,19 +79,36 @@ const controller = (() => {
     addFile,
     getTabs,
     saveTabs,
+    getCurFileId,
+    saveCurFileId,
+    deleteFile,
+    checkFileName,
   };
 })();
 
 function Notepad2() {
-  const [files, setFiles] = useState([]);
+  const [files, _setFiles] = useState([]);
   const [tabs, _setTabs] = useState(controller.getTabs());
-  const [curFileId, setCurFileId] = useState(0);
+  const [curFileId, setCurFileId] = useState(controller.getCurFileId());
   const [isRust, setIsRust] = useState(false);
   const [isDebounce, setIsDebounce] = useState(false);
+
+  controller.saveCurFileId(curFileId);
 
   const setTabs = (tabs) => {
     _setTabs(tabs);
     controller.saveTabs(tabs);
+  };
+
+  const setFiles = (files) => {
+    const newFiles = [...files].sort((a, b) => {
+      const nameA: string = a.name.split('.')[0];
+      const nameB: string = b.name.split('.')[0];
+
+      return nameA.localeCompare(nameB);
+    });
+
+    _setFiles(newFiles);
   };
 
   const tabsObj = files.reduce((acc, cur) => ((acc[cur.id] = cur), acc), {});
@@ -106,11 +143,73 @@ function Notepad2() {
     });
   });
 
+  // 파일 삭제 이벤트
+  afterRender((selector) => {
+    const btns = selector('delete', { all: true });
+
+    btns.forEach((btn) => {
+      const targetId = Number(btn.parentNode.parentNode.id);
+
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+
+        await controller.deleteFile(targetId);
+
+        setTabs(tabs.filter((id) => id !== targetId));
+        setFiles(files.filter((file) => file.id !== targetId));
+      });
+    });
+  });
+
+  // 파일 이름 변경 이벤트
+  afterRender((selector) => {
+    const btns = selector('rename', { all: true });
+
+    btns.forEach((btn) => {
+      const targetId = btn.parentNode.parentNode.id;
+
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+
+        const targetFile = tabsObj[targetId];
+        const newName = prompt('파일명 변경', targetFile.name);
+
+        if (newName == null) {
+          return;
+        }
+
+        if (!controller.checkFileName(newName)) {
+          alert('잘못된 파일 형식');
+
+          return;
+        }
+
+        targetFile.name = newName;
+
+        await fileApi.putFile(targetFile);
+
+        const newFiles = files.map((file) => file.id === targetId ? (file.name = newName, file) : file);
+
+        setFiles(newFiles);
+      });
+    });
+  });
+
   // Add file 버튼 이벤트
   afterRender((selector) => {
     const addButton = selector('new-file-button');
     addButton.addEventListener('click', async () => {
       const fileName = window.prompt('파일명', '');
+
+      if (fileName == null) {
+        return;
+      }
+
+      if (!controller.checkFileName(fileName)) {
+        alert('잘못된 파일형식');
+
+        return;
+      }
 
       if (files.some((file: File) => file.name === fileName)) {
         alert('이미 존재하는 파일명 입니다');
@@ -127,6 +226,7 @@ function Notepad2() {
         activeTab: true,
       });
 
+      setCurFileId(newFile.id);
       setFiles([...files, newFile]);
     });
   });
@@ -255,7 +355,9 @@ function Notepad2() {
       (file: File) => `
         <li class="file ${file.id === curFileId ? 'selected' : ''}" id="${file.id}">
           <p>${file.name}</p>
-          <button class="delete">X</button>
+          <div>
+            <button class="rename">edit</button> <button class="delete">X</button>
+          <div>
         </li>
       `,
     )
