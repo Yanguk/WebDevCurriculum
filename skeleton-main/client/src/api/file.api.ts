@@ -26,7 +26,7 @@ const getAll = async () => {
   }
 };
 
-const postFile = async (file: File) => {
+const postFile = async (file) => {
   const token = getJwtToken();
 
   const response = await fetch(`${SERVER_URL}/file`, {

@@ -4,8 +4,9 @@ import { vmFactory } from '@/lib/vmFactory';
 import { sha256 } from '@/lib/pkg/rust_hash2';
 import SHA256 from '@/lib/jsHash';
 import { customDebounce } from '@/lib';
+import authApi from '@/api/auth.api';
 
-const VM = vmFactory();
+const { useState, useEffect, afterRender, makeComponent } = vmFactory();
 
 const controller = (() => {
   const getTimePerformance = <T extends (...a: any[]) => any>(f: T) => {
@@ -31,9 +32,24 @@ const controller = (() => {
     console.log(result);
   };
 
-  const addFile = async (file: File) => {
+  const addFile = async (file) => {
     const result = await fileApi.postFile(file);
     console.log(result);
+
+    return result;
+  };
+
+  const getTabs = () => {
+    // todo: 로컬스토리지에서 꺼내오기
+    const tabs = window.localStorage.getItem('tabs');
+
+    return JSON.parse(tabs) || [];
+  };
+
+  const saveTabs = <T extends []>(tabs: T) => {
+    window.localStorage.setItem('tabs', JSON.stringify(tabs));
+
+    return true;
   };
 
   return {
@@ -41,16 +57,26 @@ const controller = (() => {
     getAll,
     saveFile,
     addFile,
+    getTabs,
+    saveTabs,
   };
 })();
 
 function Notepad2() {
-  const [files, setFiles] = VM.useState<File[]>([]);
-  const [curFileId, setCurFileId] = VM.useState(0);
-  const [isRust, setIsRust] = VM.useState(false);
-  const [isDebounce, setIsDebounce] = VM.useState(false);
+  const [files, setFiles] = useState([]);
+  const [tabs, _setTabs] = useState(controller.getTabs());
+  const [curFileId, setCurFileId] = useState(0);
+  const [isRust, setIsRust] = useState(false);
+  const [isDebounce, setIsDebounce] = useState(false);
 
-  VM.useEffect(async () => {
+  const setTabs = (tabs) => {
+    _setTabs(tabs);
+    controller.saveTabs(tabs);
+  };
+
+  const tabsObj = files.reduce((acc, cur) => ((acc[cur.id] = cur), acc), {});
+
+  useEffect(async () => {
     const files = await controller.getAll();
     const newFiles = files.map((file: FileInfo) => new File(file));
 
@@ -58,25 +84,110 @@ function Notepad2() {
   }, []);
 
   // 파일리스트 클릭시 활성화
-  VM.afterRender((selector) => {
+  afterRender((selector) => {
     const fileNodes: NodeList = selector('file', { all: true });
 
     fileNodes.forEach((node) => {
       node.addEventListener('click', (e) => {
         const targetId = Number(node.id);
 
-        const newFiles = files.map((file: File) =>
-          file.id === targetId ? new File({ ...file, activeTab: true }) : file
-        );
+        const isActiveTab = tabs.some((id) => targetId === id);
 
         setCurFileId(targetId);
-        setFiles(newFiles);
+
+        if (isActiveTab) {
+          return;
+        }
+
+        const newTabs = [...tabs, targetId];
+
+        setTabs(newTabs);
+      });
+    });
+  });
+
+  // Add file 버튼 이벤트
+  afterRender((selector) => {
+    const addButton = selector('new-file-button');
+    addButton.addEventListener('click', async () => {
+      const fileName = window.prompt('파일명', '');
+
+      if (files.some((file: File) => file.name === fileName)) {
+        alert('이미 존재하는 파일명 입니다');
+
+        return;
+      }
+
+      const newFileInfo = await controller.addFile({ name: fileName, content: '' });
+
+      const newFile: File = new File({
+        id: newFileInfo.id,
+        name: newFileInfo.name,
+        content: newFileInfo.content,
+        activeTab: true,
+      });
+
+      setFiles([...files, newFile]);
+    });
+  });
+
+  //saveButton Event
+  afterRender((selector) => {
+    const saveButton = selector('save-button') as HTMLElement;
+    const targetFile = files.find((file: File) => file.id === curFileId);
+
+    saveButton.addEventListener('click', async () => {
+      if (targetFile) {
+        await controller.saveFile(targetFile);
+      }
+    });
+  });
+
+  //logout 버튼
+  afterRender((selector) => {
+    const logoutButton = selector('logout-button');
+
+    logoutButton.addEventListener('click', async (e) => {
+      await authApi.logout();
+
+      window.location.reload();
+    });
+  })
+
+  // tab click 버튼
+  afterRender((selector) => {
+    const tabs = selector('tab', { all: true });
+
+    tabs.forEach((node) => {
+      node.addEventListener('click', (e) => {
+        const targetId = e.currentTarget.dataset.id;
+
+        setCurFileId(Number(targetId));
+      });
+    });
+  });
+
+  // tab close 버튼
+  afterRender((selector) => {
+    const tabButtons = selector('closeTab', { all: true });
+
+    tabButtons.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+
+        const targetId = e.currentTarget.dataset.id;
+
+        setTabs(tabs.filter((id) => id !== Number(targetId)));
+
+        if (curFileId === Number(targetId)) {
+          setCurFileId(0);
+        }
       });
     });
   });
 
   // 컨텐츠 영역 활성화
-  VM.afterRender((selector) => {
+  afterRender((selector) => {
     const contextArea = selector('content-area');
     const targetFile = files.find((file: File) => file.id === curFileId);
 
@@ -88,7 +199,7 @@ function Notepad2() {
   });
 
   // 컨텐츠 영역 onChange
-  VM.afterRender((selector) => {
+  afterRender((selector) => {
     const hashBoxEl = selector('hash') as HTMLElement;
     const contentEl = selector('content-area') as HTMLElement;
     const buttonEl = selector('hash-button') as HTMLElement;
@@ -124,20 +235,8 @@ function Notepad2() {
     contentEl.addEventListener('input', hashHandler);
   });
 
-  //saveButton Event
-  VM.afterRender((selector) => {
-    const saveButton = selector('save-button') as HTMLElement;
-    const targetFile = files.find((file: File) => file.id === curFileId);
-
-    saveButton.addEventListener('click', async () => {
-      if (targetFile) {
-        await controller.saveFile(targetFile);
-      }
-    });
-  });
-
   // debounce 버튼 이벤트
-  VM.afterRender((selector) => {
+  afterRender((selector) => {
     const debounceButton = selector('debounce');
 
     debounceButton.addEventListener('click', () => {
@@ -146,7 +245,7 @@ function Notepad2() {
   });
 
   // focus 설정
-  VM.afterRender((selector) => {
+  afterRender((selector) => {
     const contentEl = selector('content-area') as HTMLElement;
     contentEl.focus();
   });
@@ -154,24 +253,29 @@ function Notepad2() {
   const fileTemplate = files
     .map(
       (file: File) => `
-    <li class="file ${file.id === curFileId ? 'selected' : ''}" id="${file.id}">
-      <p>${file.name}</p>
-      <button class="delete">X</button>
-    </li>
-  `
+        <li class="file ${file.id === curFileId ? 'selected' : ''}" id="${file.id}">
+          <p>${file.name}</p>
+          <button class="delete">X</button>
+        </li>
+      `,
     )
     .join('');
 
-  const tapTemplate = files
-    .filter((file: File) => file.activeTab)
-    .map(
-      (file: File) => `
-      <li class="tab ${file.id === curFileId ? 'selected' : ''}" id="file${file.id}">
-        <p class="name">${file.name}</p>
-        <button class="closeTab">X</button>
-      </li>
-    `
-    )
+  const tapTemplate = tabs
+    .map((id) => {
+      const file = tabsObj[id];
+
+      if (!file) {
+        return '';
+      }
+
+      return `
+        <li class="tab ${file.id === curFileId ? 'selected' : ''}" data-id="${file.id}">
+          <p class="name">${file.name}</p>
+          <button class="closeTab" data-id="${file.id}">X</button>
+        </li>
+      `;
+    })
     .join('');
 
   return `
@@ -206,4 +310,4 @@ function Notepad2() {
   `;
 }
 
-export default VM.makeComponent(Notepad2);
+export default makeComponent(Notepad2);
