@@ -12,7 +12,7 @@ const getAll = async () => {
     }
 
     const response = await fetch(`${SERVER_URL}/file`, {
-      credentials: 'include',
+      // credentials: 'include',
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -36,7 +36,7 @@ const postFile = async (file) => {
       Accept: 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    credentials: 'include',
+    // credentials: 'include',
     body: JSON.stringify(file),
   });
 
@@ -55,7 +55,7 @@ const putFile = async (file) => {
       Accept: 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    credentials: 'include',
+    // credentials: 'include',
     body: JSON.stringify(file),
   });
 
@@ -74,7 +74,7 @@ const deleteFile = async (id) => {
       Accept: 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    credentials: 'include',
+    // credentials: 'include',
     body: JSON.stringify({ id }),
   });
 

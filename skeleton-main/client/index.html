@@ -2,6 +2,45 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+
+    <!-- 주소창 등의 웹 브라우저 UI를 표시하지 않기 -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- 상태 바의 스타일을 지정 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <!-- 홈 화면에서 표시되는 앱 이름을 지정 -->
+    <meta name="apple-mobile-web-app-title" content="Editor" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <!-- 홈 화면에서 표시되는 앱 아이콘을 지정 -->
+    <link rel="apple-touch-icon" href="icon-256x256.png" />
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js', { scope: '/' });
+        });
+
+        function showNotification() {
+          Notification.requestPermission((result) => {
+            if (result === 'granted') {
+              navigator.serviceWorker.ready.then((registration) => {
+                registration.showNotification('Vibration Sample', {
+                  body: 'Buzz! Buzz!',
+                  icon: '../images/touch/chrome-touch-icon-192x192.png',
+                  vibrate: [200, 100, 200, 100, 200, 100, 200],
+                  tag: 'vibration-sample',
+                });
+              });
+            }
+          });
+        }
+        showNotification();
+
+        const sendNoti = () => {
+          
+        }
+      }
+    </script>
   </head>
   <body>
     <main id="root"></main>

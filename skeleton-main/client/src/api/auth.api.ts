@@ -48,7 +48,7 @@ const loginSession = async (body) => {
         'Content-Type': 'application/json',
         Accept: 'application/json',
       },
-      credentials: 'include',
+      // credentials: 'include',
       body: JSON.stringify(body),
     });
 
@@ -67,7 +67,7 @@ const loginCheck = async () => {
 
     // credentials 이란 쿠키, auth 등등 을 말하며 크로스오리진에서 가능할라면 include속성을 줍니다.
     const response = await fetch(`${SERVER_URL}/auth`, {
-      credentials: 'include',
+      // credentials: 'include',
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -98,7 +98,7 @@ const logout = async () => {
   // session: 서버에서 세션 삭제;
   const response = await fetch(`${SERVER_URL}/auth/logout`, {
     method: 'POST',
-    credentials: 'include',
+    // credentials: 'include',
   });
 
   await response.json();

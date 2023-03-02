@@ -9,7 +9,7 @@ import authApi from '@/api/auth.api';
 const { useState, useEffect, afterRender, makeComponent } = vmFactory();
 
 const controller = (() => {
-  const getTimePerformance = <T extends (...a: any[]) => any>(f: T) => {
+  const getTimePerformance = <T extends (...a: unknown[]) => unknown>(f: T) => {
     const _startTime: number = performance.now();
 
     const result = f();
@@ -70,7 +70,11 @@ const controller = (() => {
   const checkFileName = (name: string) => {
     const reges = /^[a-zA-Z0-9가-힣_-]+\.[a-zA-Z0-9]+$/;
     return reges.test(name);
-  }
+  };
+
+  const sendNoti = () => {
+
+  };
 
   return {
     getTimePerformance,
@@ -83,6 +87,7 @@ const controller = (() => {
     saveCurFileId,
     deleteFile,
     checkFileName,
+    sendNoti,
   };
 })();
 
@@ -188,7 +193,9 @@ function Notepad2() {
 
         await fileApi.putFile(targetFile);
 
-        const newFiles = files.map((file) => file.id === targetId ? (file.name = newName, file) : file);
+        const newFiles = files.map((file) =>
+          file.id === targetId ? ((file.name = newName), file) : file,
+        );
 
         setFiles(newFiles);
       });
@@ -239,6 +246,9 @@ function Notepad2() {
     saveButton.addEventListener('click', async () => {
       if (targetFile) {
         await controller.saveFile(targetFile);
+
+        const contentEl = selector('content-area') as HTMLElement;
+        contentEl.focus();
       }
     });
   });
@@ -252,7 +262,7 @@ function Notepad2() {
 
       window.location.reload();
     });
-  })
+  });
 
   // tab click 버튼
   afterRender((selector) => {
