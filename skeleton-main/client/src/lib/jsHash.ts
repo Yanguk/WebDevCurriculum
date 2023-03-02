@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-array-constructor */
-/* eslint-disable no-var */
+/* eslint-disable */
+/* tslint:disable */
 export default function SHA256(s) {
   var chrsz = 8;
   var hexcase = 0;

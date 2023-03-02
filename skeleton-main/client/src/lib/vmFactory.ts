@@ -18,18 +18,21 @@ export const vmFactory = () => {
   type _mountAfterFn = (a: typeof _selector) => void;
   const _mountAfterFns: _mountAfterFn[] = [];
 
-  function _selector(className: string, inputOption: { selector?: string; all?: boolean } = {}) {
-    const defaultOption = { selector: 'class', all: false };
-    const option = { ...defaultOption, ...inputOption };
-
+  function _selector<
+    T extends boolean,
+    R extends (U extends { all?: infer Z } ? Z : false) extends true
+      ? NodeListOf<Element>
+      : Element,
+    U extends { selector?: string; all?: T },
+  >(className: string, option: U = { selector: 'class', all: false } as U): R {
     const selectName = option.selector === 'id' ? `#${className}` : `.${className}`;
 
     const selectElement = (el: any) =>
       option.all
-        ? Option.wrap(el.querySelectorAll(selectName) as NodeList)
-        : Option.wrap(el.querySelector(selectName) as Node);
+        ? Option.wrap(el.querySelectorAll(selectName))
+        : Option.wrap(el.querySelector(selectName));
 
-    return root.andThen<any>(selectElement).expect('존재하지 않는 Dom 접근');
+    return root.andThen(selectElement).expect('존재하지 않는 Dom 접근');
   }
 
   function _runMountAfter() {
@@ -88,7 +91,7 @@ export const vmFactory = () => {
     const oldDeps = Option.wrap(_states[_stateIdx]);
 
     const hasChangedDeps = oldDeps.isSomeAnd((oldDeps) =>
-      depArray.some((dep, i) => !Object.is(dep, oldDeps[i]))
+      depArray.some((dep, i) => !Object.is(dep, oldDeps[i])),
     );
 
     const hasChanged = oldDeps.isSome() ? hasChangedDeps : true;
