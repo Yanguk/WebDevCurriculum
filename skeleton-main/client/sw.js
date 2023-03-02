@@ -23,7 +23,7 @@ self.addEventListener('fetch', (e) => {
   };
 
   // self.showNotification(title, options);
-  self.registration.showNotification(title, options);
+  // self.registration.showNotification(title, options);
 });
 
 // self.addEventListener('message', event => {
