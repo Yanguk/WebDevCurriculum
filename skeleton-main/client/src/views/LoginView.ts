@@ -1,4 +1,4 @@
-import apiModel from '../api/auth.api';
+// import apiModel from '../api/auth.api';
 
 const render = () => {
   const template = `
@@ -18,63 +18,63 @@ const render = () => {
     </section>
   `;
 
-  document.querySelector('#root').innerHTML = template;
+  // document.querySelector('#root').innerHTML = template;
 
-  addAuthButtonEvent();
+  // addAuthButtonEvent();
 };
 
-function addAuthButtonEvent() {
-  const jwtButton = document.querySelector('.jwt');
-  const sessionButton = document.querySelector('.session');
-  const singUpButton = document.querySelector('.singup');
+// function addAuthButtonEvent() {
+//   const jwtButton = document.querySelector('.jwt');
+//   const sessionButton = document.querySelector('.session');
+//   const singUpButton = document.querySelector('.singup');
 
-  jwtButton.addEventListener('click', jwtLogin);
-  sessionButton.addEventListener('click', sessionLogin);
-  singUpButton.addEventListener('click', singUp);
-}
+//   jwtButton.addEventListener('click', jwtLogin);
+//   sessionButton.addEventListener('click', sessionLogin);
+//   singUpButton.addEventListener('click', singUp);
+// }
 
-async function singUp() {
-  const formData = getInputValue();
+// async function singUp() {
+//   const formData = getInputValue();
 
-  const result = await apiModel.signup(formData);
+//   const result = await apiModel.signup(formData);
 
-  if (result.ok) {
-    alert('가입성공');
-  } else {
-    alert('가입실패');
-  }
-}
+//   if (result.ok) {
+//     alert('가입성공');
+//   } else {
+//     alert('가입실패');
+//   }
+// }
 
-async function jwtLogin(e) {
-  try {
-    const formData = getInputValue();
-    const result = await apiModel.loginJWT(formData);
+// async function jwtLogin(e) {
+//   try {
+//     const formData = getInputValue();
+//     const result = await apiModel.loginJWT(formData);
 
-    document.cookie = `jwt=${result.token}`;
+//     document.cookie = `jwt=${result.token}`;
 
-    window.location.reload();
-  } catch (err) {
-    alert('로그인 실패');
-  }
-}
+//     window.location.reload();
+//   } catch (err) {
+//     alert('로그인 실패');
+//   }
+// }
 
-async function sessionLogin(e) {
-  const formData = getInputValue();
+// async function sessionLogin(e) {
+//   const formData = getInputValue();
 
-  await apiModel.loginSession(formData);
+//   await apiModel.loginSession(formData);
 
-  window.location.reload();
-}
+//   window.location.reload();
+// }
 
-function getInputValue() {
-  const id = document.querySelector('#id').value;
-  const password = document.querySelector('#password').value;
+// function getInputValue() {
+//   const id = document.querySelector('#id').value;
+//   const password = document.querySelector('#password').value;
 
-  return {
-    name: id,
-    password,
-  };
-}
+//   return {
+//     name: id,
+//     password,
+//   };
+// }
 
 export default {
   render,

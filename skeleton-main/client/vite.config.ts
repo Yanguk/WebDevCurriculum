@@ -4,14 +4,19 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default {
   server: {
-    port: 3001,
+    port: 3000,
     cors: true,
   },
   resolve: {
     alias: [{ find: '@', replacement: '/src' }],
   },
   build: {
-    outDir: 'dist',
+    rollupOptions: {
+      input: 'src/main.ts',
+      output: {
+        file: 'dist/bundle.js',
+      },
+    },
   },
   publicDir: 'public',
   plugins: [

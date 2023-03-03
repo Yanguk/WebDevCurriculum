@@ -20,5 +20,5 @@
     },
     "experimentalDecorators": true
   },
-  "include": ["src", "sw.js"]
+  "include": ["src", "public/sw.js"]
 }
