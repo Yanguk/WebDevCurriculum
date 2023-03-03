@@ -1,7 +1,4 @@
-console.log('Started', self);
-
 self.addEventListener('install', function (event) {
-  self.skipWaiting();
   console.log('Installed', event);
 });
 
@@ -9,21 +6,21 @@ self.addEventListener('activate', function (event) {
   console.log('Activated', event);
 });
 
-self.addEventListener('push', function(event) {
+self.addEventListener('push', function (event) {
   console.log('Push message received', event);
   // TODO
 });
 
 self.addEventListener('fetch', (e) => {
-  console.log('fetching:', e);
+  // console.log('fetching:', e.request);
+  if (e.request.method === 'PUT' && e.request.url === 'http://localhost:8000/file') {
+    const title = 'Simple Title';
+    const options = {
+      body: '저장 성공!',
+    };
 
-  var title = 'Simple Title';
-  var options = {
-    body: '리퀘스트 날렸어요',
-  };
-
-  // self.showNotification(title, options);
-  self.registration.showNotification(title, options);
+    self.registration.showNotification(title, options);
+  }
 });
 
 // self.addEventListener('message', event => {

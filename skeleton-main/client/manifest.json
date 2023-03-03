@@ -2,7 +2,7 @@
   "name": "knowre-editer",
   "short_name": "editor",
   "icons": [{
-    "src": "icon-256x256.png",
+    "src": "/src/public/icon-256x256.png",
     "sizes": "256x256",
     "type": "image/png"
   }],
