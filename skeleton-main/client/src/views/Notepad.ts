@@ -28,13 +28,13 @@ const controller = (() => {
   };
 
   const saveFile = async (file: File) => {
-    const result = await fileApi.putFile(file);
-    console.log(result);
+    await fileApi.putFile(file);
+
+    return true;
   };
 
   const addFile = async (file) => {
     const result = await fileApi.postFile(file);
-    console.log(result);
 
     return result;
   };

@@ -11,7 +11,6 @@ export const vmFactory = () => {
   let _component = () => '';
 
   const realRendering = customDebounce(() => {
-    console.log('rendering!');
     realRender();
   }, 50);
 
