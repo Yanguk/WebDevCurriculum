@@ -1,11 +1,13 @@
 {
   "name": "knowre-editer",
   "short_name": "editor",
-  "icons": [{
-    "src": "icon-256x256.png",
-    "sizes": "256x256",
-    "type": "image/png"
-  }],
+  "icons": [
+    {
+      "src": "icon-256x256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    }
+  ],
   "display": "standalone",
   "background_color": "#FFFFFF",
   "theme_color": "#FFFFFF"

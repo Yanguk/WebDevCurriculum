@@ -13,3 +13,7 @@ _data/
 
 # rust
 target
+
+#dev
+dev-dist
+dist

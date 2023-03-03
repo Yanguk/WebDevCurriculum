@@ -6,7 +6,7 @@ const getAll = async () => {
     const token = getJwtToken();
 
     if (!token) {
-      console.log('나머지 기능은 jwt로 로그인하는걸로 구현되어있음');
+      console.error('나머지 기능은 jwt로 로그인하는걸로 구현되어있음');
 
       return { data: [] };
     }
@@ -41,7 +41,7 @@ const postFile = async (file) => {
   });
 
   const result = await response.json();
-  console.log(result);
+
   return result.data;
 };
 

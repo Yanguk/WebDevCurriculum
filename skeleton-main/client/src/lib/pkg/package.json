@@ -1,0 +1,13 @@
+{
+  "name": "rust-hash2",
+  "version": "0.1.0",
+  "files": [
+    "rust_hash2_bg.wasm",
+    "rust_hash2.js",
+    "rust_hash2_bg.js",
+    "rust_hash2.d.ts"
+  ],
+  "module": "rust_hash2.js",
+  "types": "rust_hash2.d.ts",
+  "sideEffects": false
+}
